@@ -1,0 +1,46 @@
+import { ApiError, errorResponse, successResponse } from '../../../lib/api-response';
+import { getOrCreateGuestUser } from '../../../lib/auth';
+import { favoriteSchema } from '../../../lib/validators';
+import { addFavorite, getFavorites, removeFavorite } from '../../../services/favorite.service';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: Request) {
+  try {
+    const user = await getOrCreateGuestUser(req);
+    const favorites = await getFavorites(user.id);
+
+    return successResponse(favorites);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const user = await getOrCreateGuestUser(req);
+    const body = favoriteSchema.parse(await req.json());
+    const favorites = await addFavorite(user.id, body.cardId);
+
+    return successResponse(favorites, { status: 201 });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const user = await getOrCreateGuestUser(req);
+    const { searchParams } = new URL(req.url);
+    const cardId = searchParams.get('cardId');
+
+    if (!cardId) {
+      throw new ApiError(400, 'Missing cardId query parameter');
+    }
+
+    const favorites = await removeFavorite(user.id, cardId);
+    return successResponse(favorites);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
