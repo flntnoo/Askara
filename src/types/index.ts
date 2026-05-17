@@ -71,6 +71,8 @@ export type ConversationCard = {
 
 export type SessionStatus = 'active' | 'completed' | 'abandoned';
 
+export type SessionMode = 'solo' | 'table' | 'multiplayer';
+
 export type CardAction = 'viewed' | 'skipped' | 'favorited' | 'unfavorited';
 
 export type SessionCardLog = {
@@ -82,6 +84,7 @@ export type SessionCardLog = {
 export type CardSession = {
   id: string;
   deckId: string;
+  mode: SessionMode;
   status: SessionStatus;
   startedAt: string;
   endedAt?: string;
@@ -90,6 +93,69 @@ export type CardSession = {
   skippedCardIds: string[];
   favoriteCardIds: string[];
   logs: SessionCardLog[];
+};
+
+export type TableCardState = {
+  id: string;
+  sessionId: string;
+  cardId: string;
+  position: number;
+  isRevealed: boolean;
+  revealedAt?: string;
+  revealedByUserId?: string;
+  card: ConversationCard;
+};
+
+export type TableSession = {
+  id: string;
+  deckId: string;
+  mode: Extract<SessionMode, 'table'>;
+  status: SessionStatus;
+  startedAt: string;
+  endedAt?: string;
+  deck: Deck;
+  cards: TableCardState[];
+};
+
+export type MultiplayerRoomStatus = 'waiting' | 'active' | 'completed';
+
+export type RoomPlayer = {
+  id: string;
+  roomId: string;
+  userId?: string;
+  displayName: string;
+  role: 'host' | 'player';
+  position: number;
+  isActive: boolean;
+  joinedAt: string;
+};
+
+export type RoomCardState = {
+  id: string;
+  roomId: string;
+  cardId: string;
+  position: number;
+  isRevealed: boolean;
+  revealedAt?: string;
+  revealedByPlayerId?: string;
+  revealedByPlayerName?: string;
+  card: ConversationCard;
+};
+
+export type MultiplayerRoom = {
+  id: string;
+  code: string;
+  deckId: string;
+  hostUserId?: string;
+  status: MultiplayerRoomStatus;
+  currentTurnPlayerId?: string;
+  turnIndex: number;
+  createdAt: string;
+  updatedAt: string;
+  deck: Deck;
+  players: RoomPlayer[];
+  cards: RoomCardState[];
+  latestRevealedCard?: RoomCardState | null;
 };
 
 export type RelationshipType = 'partner' | 'pdkt' | 'friend' | 'family' | 'self';

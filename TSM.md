@@ -202,6 +202,7 @@ Admin Content Panel
 /premium
 /auth
 /profile
+/rooms/[code]
 /admin
 ```
 
@@ -222,6 +223,7 @@ Admin Content Panel
 | `/settings` | Preferences/reset data | P1 |
 | `/share/[cardId]` | Share card preview | P1 |
 | `/premium` | Premium deck offering | P2 |
+| `/rooms/[code]` | Play Together multiplayer room | P1 |
 | `/admin` | Content management | P2 |
 
 ---
@@ -503,7 +505,54 @@ export type CardSession = {
 
 ---
 
-### 10.4 Onboarding Preference
+### 10.4 Play Together Multiplayer
+
+```ts
+export enum RoomStatus {
+  Waiting = "waiting",
+  Active = "active",
+  Ended = "ended",
+  Abandoned = "abandoned",
+}
+
+export type MultiplayerRoom = {
+  id: string;
+  code: string;
+  deckId: string;
+  hostPlayerId: string;
+  status: RoomStatus;
+  currentTurnPlayerId?: string;
+  turnIndex: number;
+  createdAt: string;
+  startedAt?: string;
+  endedAt?: string;
+};
+
+export type RoomPlayer = {
+  id: string;
+  roomId: string;
+  userId?: string;
+  displayName: string;
+  seatIndex: number;
+  isHost: boolean;
+  joinedAt: string;
+  leftAt?: string;
+};
+
+export type RoomCard = {
+  id: string;
+  roomId: string;
+  cardId: string;
+  position: number;
+  isRevealed: boolean;
+  revealedAt?: string;
+  revealedByPlayerId?: string;
+};
+```
+
+---
+
+### 10.5 Onboarding Preference
 
 ```ts
 export type RelationshipType =
@@ -536,7 +585,7 @@ export type OnboardingPreference = {
 
 ---
 
-### 10.5 Anonymous User
+### 10.6 Anonymous User
 
 ```ts
 export type AnonymousUser = {
@@ -1018,6 +1067,89 @@ Session tetap active
 ↓
 Home menampilkan Continue Session
 ```
+
+---
+
+### 15.7 Play Together Mode Flow
+
+Play Together Mode menggunakan room multiplayer turn-based. Phase awal boleh memakai polling, lalu dapat dinaikkan ke WebSocket/Socket.IO tanpa mengubah kontrak event utama.
+
+#### Create Room Flow
+
+```txt
+Host membuka deck detail
+-> Host klik Play Together
+-> System membuat MultiplayerRoom
+-> System membuat RoomPlayer untuk host
+-> System membuat RoomCard berdasarkan card deck order
+-> Redirect ke /rooms/[code]
+```
+
+#### Join Room Flow
+
+```txt
+Player membuka room link atau memasukkan code
+-> System validasi room code
+-> Jika room waiting/active:
+   buat RoomPlayer
+   tampilkan room state terbaru
+-> Jika room ended:
+   tampilkan room ended state
+```
+
+#### Turn Management Rules
+
+- Room memiliki `currentTurnPlayerId` dan `turnIndex`.
+- Saat room dimulai, current turn diarahkan ke player aktif dengan `seatIndex` terkecil.
+- Hanya `currentTurnPlayerId` yang boleh melakukan reveal.
+- Setelah card revealed, turn tidak otomatis berpindah sampai action `next-turn` dijalankan.
+- `next-turn` memilih player aktif berikutnya berdasarkan urutan `seatIndex`.
+- Player yang sudah `leftAt` tidak mendapat turn.
+- Jika current-turn player keluar, host atau system dapat memindahkan turn ke player aktif berikutnya.
+- Jika room status bukan `active`, reveal dan next-turn ditolak.
+- Host dapat mengakhiri room; setelah ended, semua action mutasi ditolak kecuali read.
+
+#### API Contract
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/rooms` | Create multiplayer room |
+| `POST` | `/api/rooms/[code]/join` | Join room by code |
+| `GET` | `/api/rooms/[code]` | Fetch room state |
+| `POST` | `/api/rooms/[code]/cards/[roomCardId]/reveal` | Reveal card if current-turn player |
+| `POST` | `/api/rooms/[code]/next-turn` | Advance turn to next player |
+| `POST` | `/api/rooms/[code]/leave` | Mark player as left |
+| `POST` | `/api/rooms/[code]/end` | Host ends room |
+
+Request/response shape should return the full room state after mutating actions:
+
+```ts
+type MultiplayerRoomState = {
+  room: MultiplayerRoom;
+  players: RoomPlayer[];
+  cards: Array<RoomCard & { card: ConversationCard }>;
+};
+```
+
+#### Real-time Event Contract
+
+```ts
+type RoomEvent =
+  | { type: "room:player_joined"; roomCode: string; player: RoomPlayer }
+  | { type: "room:card_revealed"; roomCode: string; roomCard: RoomCard }
+  | { type: "room:turn_changed"; roomCode: string; currentTurnPlayerId: string; turnIndex: number }
+  | { type: "room:player_left"; roomCode: string; playerId: string }
+  | { type: "room:ended"; roomCode: string; endedAt: string };
+```
+
+Realtime behavior:
+
+- `room:player_joined` fires after successful join.
+- `room:card_revealed` fires after reveal succeeds.
+- `room:turn_changed` fires after next-turn succeeds.
+- `room:player_left` fires after leave succeeds or disconnect timeout is confirmed.
+- `room:ended` fires when host ends the session.
+- Polling fallback should call `GET /api/rooms/[code]` on an interval and reconcile by server state.
 
 ---
 

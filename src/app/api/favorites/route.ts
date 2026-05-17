@@ -1,5 +1,5 @@
 import { ApiError, errorResponse, successResponse } from '../../../lib/api-response';
-import { getOrCreateGuestUser } from '../../../lib/auth';
+import { getCurrentUserOrGuest } from '../../../lib/auth';
 import { favoriteSchema } from '../../../lib/validators';
 import { addFavorite, getFavorites, removeFavorite } from '../../../services/favorite.service';
 
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const favorites = await getFavorites(user.id);
 
     return successResponse(favorites);
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const body = favoriteSchema.parse(await req.json());
     const favorites = await addFavorite(user.id, body.cardId);
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const { searchParams } = new URL(req.url);
     const cardId = searchParams.get('cardId');
 

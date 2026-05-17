@@ -1022,6 +1022,46 @@ User melihat ringkasan setelah sesi selesai.
 
 ---
 
+### 14.8 Play Together Mode
+
+#### Description
+
+Play Together Mode adalah mode multiplayer turn-based yang memungkinkan beberapa pemain masuk ke room yang sama, memilih kartu secara bergiliran, dan melihat kartu yang sudah dibuka bersama-sama.
+
+#### Goal
+
+Allow multiple players to choose and reveal cards in turn-based sessions.
+
+#### Functional Requirements
+
+- Host bisa membuat multiplayer room dari deck.
+- Room memiliki code atau link yang bisa dibagikan.
+- Pemain lain bisa join room menggunakan code atau link.
+- Sistem menampilkan daftar pemain dalam room.
+- Sistem menentukan current-turn player.
+- Hanya current-turn player yang bisa membuka kartu dalam turn-based mode.
+- Kartu yang sudah dibuka tetap terlihat untuk semua pemain.
+- Room state tetap tersimpan setelah refresh.
+- Host bisa mengakhiri session.
+
+#### Acceptance Criteria
+
+- Room bisa dibuat dari deck aktif.
+- Join code/link membawa pemain ke room yang benar.
+- Reveal action ditolak jika bukan giliran pemain tersebut.
+- Semua pemain melihat kartu yang sudah revealed.
+- Refresh browser tidak menghapus state room.
+- End session oleh host mengubah room menjadi ended dan mencegah reveal baru.
+
+#### Product Notes
+
+- Phase awal dapat menggunakan polling sebelum realtime/WebSocket.
+- Mode ini tidak menggantikan solo play flow.
+- `/play/[sessionId]` tetap dipakai untuk solo linear session.
+- Table Mode menjadi fondasi UX untuk Play Together Mode.
+
+---
+
 ## 15. Data Model
 
 ### 15.1 Deck

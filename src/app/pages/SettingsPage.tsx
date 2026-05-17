@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Trash2, Info, Heart, HelpCircle, RotateCcw, UserRound } from 'lucide-react';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { Trash2, Info, Heart, HelpCircle, RotateCcw, UserRound, LogIn, LogOut } from 'lucide-react';
 import {
   getActiveSession,
   getFavorites,
@@ -15,15 +16,18 @@ import {
 import { AnonymousUser, OnboardingPreference } from '../../types';
 import { useFavoriteStore } from '../../stores/favoriteStore';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import { apiRequest } from '../../lib/api-client';
 
 type DialogAction = 'onboarding' | 'favorites' | 'all' | null;
 
 export default function SettingsPage() {
+  const { data: session, status } = useSession();
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
   const [anonymousUser, setAnonymousUser] = useState<AnonymousUser | null>(null);
   const [onboarding, setOnboarding] = useState<OnboardingPreference | null>(null);
   const [totalSessions, setTotalSessions] = useState(0);
   const [totalFavorites, setTotalFavorites] = useState(0);
+  const [didRequestLink, setDidRequestLink] = useState(false);
   const refreshFavoriteStore = useFavoriteStore((state) => state.refreshFavorites);
   const refreshOnboardingStore = useOnboardingStore((state) => state.refreshPreference);
 
@@ -39,6 +43,29 @@ export default function SettingsPage() {
   useEffect(() => {
     refreshStats();
   }, []);
+
+  useEffect(() => {
+    if (status !== 'authenticated' || didRequestLink) return;
+
+    setDidRequestLink(true);
+    void apiRequest('/api/auth/link-anonymous', {
+      method: 'POST',
+    })
+      .then(() => {
+        refreshStats();
+      })
+      .catch((error) => {
+        console.error('Failed to link anonymous user:', error);
+      });
+  }, [didRequestLink, status]);
+
+  const handleGoogleSignIn = () => {
+    const user = getOrCreateAnonymousUser();
+    document.cookie = `dcc_anonymous_id=${encodeURIComponent(
+      user.id,
+    )}; path=/; max-age=3600; samesite=lax`;
+    void signIn('google');
+  };
 
   const handleConfirm = () => {
     if (dialogAction === 'onboarding') {
@@ -75,7 +102,7 @@ export default function SettingsPage() {
                 Data Kamu
               </h3>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-4">
-                Semua data tersimpan di browser kamu dalam Guest Mode. Convo tidak membutuhkan login untuk MVP ini.
+                Semua data tersimpan di browser kamu dalam Guest Mode. Askara tidak membutuhkan login untuk MVP ini.
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 <div className="bg-[#f0edec] px-3 py-1 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#1c1b1b]">
@@ -96,13 +123,49 @@ export default function SettingsPage() {
         <section className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 shadow-[4px_4px_0px_#1c1b1b] mb-6">
           <div className="flex items-start gap-3">
             <UserRound className="w-5 h-5 text-[#a93718] mt-1 flex-shrink-0" />
-            <div>
+            <div className="flex-1">
               <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-lg text-[#1c1b1b] mb-2">
-                Guest Data
+                Akun
               </h3>
-              <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] break-all">
-                Anonymous ID: {anonymousUser?.id ?? 'Belum dibuat'}
-              </p>
+              {status === 'authenticated' ? (
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b]">
+                      {session.user?.name ?? 'Google user'}
+                    </p>
+                    <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] break-all">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void signOut()}
+                    className="min-h-11 border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold bg-[#f0edec] text-[#1c1b1b] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Keluar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-2">
+                      Login opsional untuk menyimpan data ke akun Google dan siap sync lintas perangkat nanti.
+                    </p>
+                    <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] break-all">
+                      Anonymous ID: {anonymousUser?.id ?? 'Belum dibuat'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    className="min-h-11 border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-2"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign in with Google
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -112,13 +175,13 @@ export default function SettingsPage() {
             <HelpCircle className="w-5 h-5 text-[#a93718] mt-1 flex-shrink-0" />
             <div>
               <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-lg text-[#1c1b1b] mb-2">
-                Tentang Convo
+                Tentang Askara
               </h3>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-2">
                 Privacy: data percakapan tidak disimpan. Hanya preferensi, sesi, dan favorit lokal yang tersimpan.
               </p>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-2">
-                Kontak: hello@convo.local
+                Kontak: hello@askara.local
               </p>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c]">
                 Versi MVP 1.0

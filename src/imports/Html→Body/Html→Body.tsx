@@ -6,7 +6,7 @@ function Heading1HeadlineBrandLogo() {
   return (
     <div className="h-[52.8px] relative shrink-0 w-[158.27px]" data-name="Heading 1 - Headline / Brand Logo">
       <div className="-translate-y-1/2 absolute flex flex-col font-['Hanken_Grotesk:ExtraBold_Italic',sans-serif] font-extrabold italic justify-center leading-[0] left-0 text-[#a93718] text-[48px] top-[25.5px] tracking-[-2.4px] uppercase whitespace-nowrap">
-        <p className="leading-[52.8px]">CONVO</p>
+        <p className="leading-[52.8px]">ASKARA</p>
       </div>
     </div>
   );

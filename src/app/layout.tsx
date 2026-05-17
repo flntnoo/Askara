@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AppShell from './components/AppShell';
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: 'Convo',
+  title: 'Askara',
   description: 'Digital conversation card app for warmer conversations.',
 };
 
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
-        <AppShell>{children}</AppShell>
+        <Providers>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

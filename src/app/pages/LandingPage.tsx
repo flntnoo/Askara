@@ -31,7 +31,7 @@ function Heading1HeadlineBrandLogo() {
   return (
     <div className="h-[40px] md:h-[52.8px] relative shrink-0 w-[120px] md:w-[158.27px]">
       <div className="-translate-y-1/2 absolute flex flex-col font-['Hanken_Grotesk',sans-serif] font-extrabold italic justify-center leading-[0] left-0 text-[#a93718] text-[32px] md:text-[48px] top-1/2 tracking-[-1.6px] md:tracking-[-2.4px] uppercase whitespace-nowrap">
-        <p className="leading-[40px] md:leading-[52.8px]">CONVO</p>
+        <p className="leading-[40px] md:leading-[52.8px]">ASKARA</p>
       </div>
     </div>
   );
@@ -450,7 +450,7 @@ function HowItWorksSection() {
 function Footer() {
   return (
     <footer className="border-t-4 border-[#1c1b1b] pt-6 w-full font-['Hanken_Grotesk',sans-serif] text-[#58413c] flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
-      <p className="font-extrabold text-[#a93718]">CONVO</p>
+      <p className="font-extrabold text-[#a93718]">ASKARA</p>
       <p className="font-medium text-sm">MVP 1.0</p>
       <p className="font-medium text-sm">Guest mode. Data tersimpan di browser kamu.</p>
     </footer>

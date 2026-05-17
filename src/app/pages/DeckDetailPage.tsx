@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft, Play, UsersRound } from 'lucide-react';
 import { getDeckBySlug } from '../../data/decks';
 import { getCardsByDeckId } from '../../data/cards';
 import { useSessionStore } from '../../stores/sessionStore';
@@ -31,9 +31,13 @@ export default function DeckDetailPage() {
     );
   }
 
-  const handleStartDeck = () => {
-    const session = createSession(deck.id);
+  const handleStartDeck = async () => {
+    const session = await createSession(deck.id);
     router.push(`/play/${session.id}`);
+  };
+
+  const handleStartMultiplayer = () => {
+    router.push(`/multiplayer/${deck.slug}`);
   };
 
   // Get first 3 cards as preview
@@ -77,14 +81,23 @@ export default function DeckDetailPage() {
             </div>
           </div>
 
-          {/* Start Button */}
-          <button
-            onClick={handleStartDeck}
-            className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center gap-3"
-          >
-            <Play className="w-5 h-5" fill="#6b1500" />
-            Mulai Deck Ini
-          </button>
+          {/* Start Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={handleStartDeck}
+              className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-3"
+            >
+              <Play className="w-5 h-5" fill="#6b1500" />
+              Mulai Deck Ini
+            </button>
+            <button
+              onClick={handleStartMultiplayer}
+              className="bg-white drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-3"
+            >
+              <UsersRound className="w-5 h-5" />
+              Play Multiplayer
+            </button>
+          </div>
         </div>
 
         {/* Suitable For */}
@@ -142,13 +155,22 @@ export default function DeckDetailPage() {
 
         {/* CTA Bottom */}
         <div className="text-center">
-          <button
-            onClick={handleStartDeck}
-            className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all inline-flex items-center gap-3"
-          >
-            <Play className="w-5 h-5" fill="#6b1500" />
-            Mulai Deck Ini
-          </button>
+          <div className="inline-flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={handleStartDeck}
+              className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all inline-flex items-center justify-center gap-3"
+            >
+              <Play className="w-5 h-5" fill="#6b1500" />
+              Mulai Deck Ini
+            </button>
+            <button
+              onClick={handleStartMultiplayer}
+              className="bg-white drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all inline-flex items-center justify-center gap-3"
+            >
+              <UsersRound className="w-5 h-5" />
+              Play Multiplayer
+            </button>
+          </div>
         </div>
       </div>
     </div>

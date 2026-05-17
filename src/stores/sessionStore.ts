@@ -11,6 +11,7 @@ import {
   saveFavorites,
 } from '../utils/storage';
 import { CardAction, CardSession } from '../types';
+import { apiRequest } from '../lib/api-client';
 
 const createSessionId = () => {
   const randomPart =
@@ -24,7 +25,7 @@ const unique = (values: string[]) => Array.from(new Set(values));
 
 type SessionStore = {
   activeSession: CardSession | null;
-  createSession: (deckId: string) => CardSession;
+  createSession: (deckId: string) => Promise<CardSession>;
   restoreSession: (sessionId: string) => CardSession | null;
   setCurrentCard: (cardId: string) => void;
   markViewed: (cardId: string) => void;
@@ -37,9 +38,53 @@ type SessionStore = {
 };
 
 export const useSessionStore = create<SessionStore>((set, get) => {
+  const createLocalSession = (deckId: string): CardSession => {
+    const now = new Date().toISOString();
+    return {
+      id: createSessionId(),
+      deckId,
+      mode: 'solo',
+      status: 'active',
+      startedAt: now,
+      currentCardId: undefined,
+      viewedCardIds: [],
+      skippedCardIds: [],
+      favoriteCardIds: [],
+      logs: [],
+    };
+  };
+
   const persistActive = (session: CardSession) => {
     saveActiveSession(session);
     set({ activeSession: session });
+  };
+
+  const syncAction = (sessionId: string, cardId: string, action: CardAction) => {
+    void apiRequest<CardSession>(`/api/sessions/${sessionId}/actions`, {
+      method: 'POST',
+      body: JSON.stringify({ cardId, action }),
+    })
+      .then((session) => {
+        if (get().activeSession?.id === session.id) {
+          persistActive(session);
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to sync session action:', error);
+      });
+  };
+
+  const syncSessionPatch = (session: CardSession) => {
+    void apiRequest<CardSession>(`/api/sessions/${session.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        status: session.status,
+        currentCardId: session.currentCardId ?? null,
+        endedAt: session.endedAt ?? null,
+      }),
+    }).catch((error) => {
+      console.error('Failed to sync session:', error);
+    });
   };
 
   const updateSession = (updater: (session: CardSession) => CardSession) => {
@@ -50,21 +95,20 @@ export const useSessionStore = create<SessionStore>((set, get) => {
 
   return {
     activeSession: null,
-    createSession: (deckId) => {
-      const now = new Date().toISOString();
-      const session: CardSession = {
-        id: createSessionId(),
-        deckId,
-        status: 'active',
-        startedAt: now,
-        currentCardId: undefined,
-        viewedCardIds: [],
-        skippedCardIds: [],
-        favoriteCardIds: [],
-        logs: [],
-      };
-      persistActive(session);
-      return session;
+    createSession: async (deckId) => {
+      try {
+        const session = await apiRequest<CardSession>('/api/sessions', {
+          method: 'POST',
+          body: JSON.stringify({ deckId }),
+        });
+        persistActive(session);
+        return session;
+      } catch (error) {
+        console.error('Failed to create remote session, using local session:', error);
+        const session = createLocalSession(deckId);
+        persistActive(session);
+        return session;
+      }
     },
     restoreSession: (sessionId) => {
       const active = getActiveSession();
@@ -73,12 +117,18 @@ export const useSessionStore = create<SessionStore>((set, get) => {
       return session;
     },
     setCurrentCard: (cardId) => {
+      const sessionId = (get().activeSession ?? getActiveSession())?.id;
       updateSession((session) => ({
         ...session,
         currentCardId: cardId,
       }));
+      const session = get().activeSession;
+      if (sessionId && session?.id === sessionId) {
+        syncSessionPatch(session);
+      }
     },
     markViewed: (cardId) => {
+      const sessionId = (get().activeSession ?? getActiveSession())?.id;
       updateSession((session) => ({
         ...session,
         viewedCardIds: unique([...session.viewedCardIds, cardId]),
@@ -87,8 +137,12 @@ export const useSessionStore = create<SessionStore>((set, get) => {
           { cardId, action: 'viewed', shownAt: new Date().toISOString() },
         ],
       }));
+      if (sessionId) {
+        syncAction(sessionId, cardId, 'viewed');
+      }
     },
     markSkipped: (cardId) => {
+      const sessionId = (get().activeSession ?? getActiveSession())?.id;
       updateSession((session) => ({
         ...session,
         skippedCardIds: unique([...session.skippedCardIds, cardId]),
@@ -97,10 +151,16 @@ export const useSessionStore = create<SessionStore>((set, get) => {
           { cardId, action: 'skipped', shownAt: new Date().toISOString() },
         ],
       }));
+      if (sessionId) {
+        syncAction(sessionId, cardId, 'skipped');
+      }
     },
     toggleFavoriteInSession: (cardId) => {
+      const sessionId = (get().activeSession ?? getActiveSession())?.id;
+      let action: CardAction = 'favorited';
       updateSession((session) => {
         const isFavorite = session.favoriteCardIds.includes(cardId);
+        action = isFavorite ? 'unfavorited' : 'favorited';
         const nextSessionFavorites = isFavorite
           ? session.favoriteCardIds.filter((id) => id !== cardId)
           : unique([...session.favoriteCardIds, cardId]);
@@ -117,12 +177,15 @@ export const useSessionStore = create<SessionStore>((set, get) => {
             ...session.logs,
             {
               cardId,
-              action: isFavorite ? 'unfavorited' : 'favorited',
+              action,
               shownAt: new Date().toISOString(),
             },
           ],
         };
       });
+      if (sessionId) {
+        syncAction(sessionId, cardId, action);
+      }
     },
     logCardAction: (cardId, action) => {
       updateSession((session) => ({
@@ -141,6 +204,7 @@ export const useSessionStore = create<SessionStore>((set, get) => {
       appendSessionHistory(completed);
       clearActiveSession();
       set({ activeSession: null });
+      syncSessionPatch(completed);
     },
     abandonSession: () => {
       const current = get().activeSession ?? getActiveSession();
@@ -153,6 +217,7 @@ export const useSessionStore = create<SessionStore>((set, get) => {
       appendSessionHistory(abandoned);
       clearActiveSession();
       set({ activeSession: null });
+      syncSessionPatch(abandoned);
     },
     refreshActiveSession: () => {
       set({ activeSession: getActiveSession() });

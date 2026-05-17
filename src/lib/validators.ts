@@ -19,6 +19,23 @@ export const createSessionSchema = z.object({
   deckId: z.string().min(1),
 });
 
+export const createTableSessionSchema = z.object({
+  deckId: z.string().min(1),
+});
+
+export const revealTableCardSchema = z.object({
+  sessionCardStateId: z.string().min(1),
+});
+
+export const createRoomSchema = z.object({
+  deckId: z.string().min(1),
+  displayName: z.string().trim().min(1).max(40).optional(),
+});
+
+export const joinRoomSchema = z.object({
+  displayName: z.string().trim().min(1).max(40).optional(),
+});
+
 export const updateSessionSchema = z.object({
   status: sessionStatusSchema.optional(),
   currentCardId: z.string().min(1).nullable().optional(),

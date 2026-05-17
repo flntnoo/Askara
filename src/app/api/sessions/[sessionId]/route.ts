@@ -1,5 +1,5 @@
 import { errorResponse, successResponse } from '../../../../lib/api-response';
-import { getOrCreateGuestUser } from '../../../../lib/auth';
+import { getCurrentUserOrGuest } from '../../../../lib/auth';
 import { updateSessionSchema } from '../../../../lib/validators';
 import { getSession, updateSession } from '../../../../services/session.service';
 
@@ -13,7 +13,7 @@ type RouteContext = {
 
 export async function GET(req: Request, context: RouteContext) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const { sessionId } = await context.params;
     const session = await getSession(sessionId, user.id);
 
@@ -25,7 +25,7 @@ export async function GET(req: Request, context: RouteContext) {
 
 export async function PATCH(req: Request, context: RouteContext) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const { sessionId } = await context.params;
     const body = updateSessionSchema.parse(await req.json());
     const session = await updateSession(sessionId, user.id, body);

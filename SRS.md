@@ -742,7 +742,93 @@ Requirement priority:
 
 ---
 
-## 11.9 Card Selection Engine Requirements
+## 11.9 Play Together Mode Requirements
+
+### FR-PTM-001 - Create Multiplayer Room
+
+**Priority:** P1  
+**Description:** User harus bisa membuat multiplayer room dari deck.
+
+**Acceptance Criteria:**
+
+- User can create a multiplayer room.
+- Room dibuat dengan unique ID.
+- Room memiliki code atau shareable link.
+- Room terhubung ke deck yang dipilih.
+- Creator room menjadi host.
+- Room status default adalah `waiting` atau `active`.
+
+---
+
+### FR-PTM-002 - Join Room by Code or Link
+
+**Priority:** P1  
+**Description:** User harus bisa bergabung ke multiplayer room menggunakan code atau link.
+
+**Acceptance Criteria:**
+
+- User can join room using code/link.
+- Sistem menolak join untuk room yang tidak ditemukan atau sudah ended.
+- Pemain yang berhasil join masuk ke daftar room players.
+
+---
+
+### FR-PTM-003 - Turn-Based Reveal Permission
+
+**Priority:** P1  
+**Description:** Hanya current-turn player yang boleh membuka kartu dalam turn-based mode.
+
+**Acceptance Criteria:**
+
+- Only current-turn player can reveal a card in turn-based mode.
+- Sistem menyimpan current-turn player.
+- Reveal action ditolak jika request bukan dari current-turn player.
+- UI menampilkan pemain yang sedang mendapat giliran.
+
+---
+
+### FR-PTM-004 - Shared Revealed Cards
+
+**Priority:** P1  
+**Description:** Kartu yang sudah dibuka harus tetap terlihat untuk semua pemain.
+
+**Acceptance Criteria:**
+
+- Revealed cards remain visible to all players.
+- Revealed card state tersimpan di room state.
+- Kartu yang sudah revealed tidak bisa dibuka ulang sebagai reveal baru.
+
+---
+
+### FR-PTM-005 - Persist Room State
+
+**Priority:** P1  
+**Description:** Room state harus tetap ada setelah refresh.
+
+**Acceptance Criteria:**
+
+- Room state persists after refresh.
+- Refresh tidak menghapus daftar pemain.
+- Refresh tidak menghapus revealed cards.
+- Refresh tidak mengubah current turn.
+
+---
+
+### FR-PTM-006 - Host Ends Session
+
+**Priority:** P1  
+**Description:** Host harus bisa mengakhiri multiplayer session.
+
+**Acceptance Criteria:**
+
+- Host can end session.
+- Non-host tidak bisa mengakhiri room.
+- Room status berubah menjadi `ended`.
+- Setelah ended, reveal dan next-turn action tidak bisa dilakukan.
+
+---
+
+## 11.10 Card Selection Engine Requirements
 
 ### FR-CSE-001 — Filter by Deck
 
@@ -799,7 +885,7 @@ Requirement priority:
 
 ---
 
-## 11.10 Favorites Requirements
+## 11.11 Favorites Requirements
 
 ### FR-FAV-001 — View Favorites Page
 
@@ -839,7 +925,7 @@ Requirement priority:
 
 ---
 
-## 11.11 Summary Requirements
+## 11.12 Summary Requirements
 
 ### FR-SUM-001 — View Session Summary
 
@@ -857,7 +943,7 @@ Requirement priority:
 
 ---
 
-## 11.12 Settings Requirements
+## 11.13 Settings Requirements
 
 ### FR-SET-001 — View Settings
 
@@ -897,7 +983,7 @@ Requirement priority:
 
 ---
 
-## 11.13 Share Requirements
+## 11.14 Share Requirements
 
 ### FR-SHR-001 — Open Share Card Page
 
@@ -925,7 +1011,7 @@ Requirement priority:
 
 ---
 
-## 11.14 Premium Requirements
+## 11.15 Premium Requirements
 
 ### FR-PRM-001 — Show Premium Deck
 
@@ -1608,4 +1694,3 @@ No-Repeat
 Session Summary
 Favorites Page
 ```
-

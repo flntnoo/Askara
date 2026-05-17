@@ -12,6 +12,7 @@ type SessionActionRecord = {
 type SessionRecord = {
   id: string;
   deckId: string;
+  mode: string;
   status: string;
   startedAt: Date;
   endedAt: Date | null;
@@ -43,6 +44,7 @@ export function serializeSession(session: SessionRecord): CardSession {
   return {
     id: session.id,
     deckId: session.deckId,
+    mode: session.mode as CardSession['mode'],
     status: session.status as CardSession['status'],
     startedAt: session.startedAt.toISOString(),
     endedAt: session.endedAt?.toISOString(),
@@ -63,7 +65,7 @@ export function serializeSession(session: SessionRecord): CardSession {
 }
 
 async function getOwnedSessionOrThrow(sessionId: string, userId: string) {
-  const session = await prisma.session.findFirst({
+  const session = await prisma.cardSession.findFirst({
     where: {
       id: sessionId,
       userId,
@@ -98,10 +100,11 @@ export async function createSession(userId: string, deckId: string) {
 
   const firstCard = await getNextCard(deckId, [], []);
 
-  const session = await prisma.session.create({
+  const session = await prisma.cardSession.create({
     data: {
       userId,
       deckId,
+      mode: 'solo',
       status: 'active',
       currentCardId: firstCard?.id ?? null,
     },
@@ -155,7 +158,7 @@ export async function updateSession(
           ? new Date()
           : undefined;
 
-  const session = await prisma.session.update({
+  const session = await prisma.cardSession.update({
     where: {
       id: sessionId,
     },
@@ -245,7 +248,7 @@ export async function logSessionAction(
       serialized.skippedCardIds,
     );
 
-    const nextSession = await prisma.session.update({
+    const nextSession = await prisma.cardSession.update({
       where: {
         id: sessionId,
       },
@@ -268,9 +271,10 @@ export async function logSessionAction(
 }
 
 export async function getActiveSession(userId: string) {
-  const session = await prisma.session.findFirst({
+  const session = await prisma.cardSession.findFirst({
     where: {
       userId,
+      mode: 'solo',
       status: 'active',
     },
     orderBy: {
@@ -289,9 +293,10 @@ export async function getActiveSession(userId: string) {
 }
 
 export async function getSessionHistory(userId: string) {
-  const sessions = await prisma.session.findMany({
+  const sessions = await prisma.cardSession.findMany({
     where: {
       userId,
+      mode: 'solo',
       status: {
         not: 'active',
       },
@@ -310,3 +315,4 @@ export async function getSessionHistory(userId: string) {
 
   return sessions.map(serializeSession);
 }
+

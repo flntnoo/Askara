@@ -31,8 +31,9 @@ model Deck {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  cards    Card[]
-  sessions Session[]
+  cards            Card[]
+  sessions         CardSession[]
+  multiplayerRooms MultiplayerRoom[]
 
   @@index([category, isActive])
   @@index([sortOrder])
@@ -52,27 +53,37 @@ model Card {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  deck           Deck            @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  deck           Deck               @relation(fields: [deckId], references: [id], onDelete: Cascade)
   sessionActions SessionAction[]
   favorites      Favorite[]
+  sessionStates  SessionCardState[]
+  roomCards      RoomCard[]
 
   @@index([deckId])
   @@index([deckId, isActive, phase, sortOrder])
 }
 
 model User {
-  id          String   @id @default(cuid())
-  anonymousId String?  @unique
-  email       String?  @unique
-  name        String?
-  provider    String   @default("anonymous")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String    @id @default(cuid())
+  anonymousId   String?   @unique
+  email         String?   @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  provider      String    @default("anonymous")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  onboarding      OnboardingPreference?
-  sessions        Session[]
-  favorites       Favorite[]
-  analyticsEvents AnalyticsEvent[]
+  onboarding             OnboardingPreference?
+  accounts               Account[]
+  authSessions           Session[]
+  authenticators         Authenticator[]
+  cardSessions           CardSession[]
+  hostedMultiplayerRooms MultiplayerRoom[]     @relation("HostedMultiplayerRooms")
+  roomPlayers            RoomPlayer[]
+  revealedCards          SessionCardState[]
+  favorites              Favorite[]
+  analyticsEvents        AnalyticsEvent[]
 
   @@index([provider])
 }
@@ -90,22 +101,48 @@ model OnboardingPreference {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Session {
-  id            String   @id @default(cuid())
+model CardSession {
+  id            String    @id @default(cuid())
   userId        String
   deckId        String
-  status        String   @default("active")
+  mode          String    @default("solo")
+  status        String    @default("active")
   currentCardId String?
-  startedAt     DateTime @default(now())
+  startedAt     DateTime  @default(now())
   endedAt       DateTime?
 
-  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deck    Deck            @relation(fields: [deckId], references: [id])
-  actions SessionAction[]
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deck       Deck               @relation(fields: [deckId], references: [id])
+  actions    SessionAction[]
+  cardStates SessionCardState[]
 
   @@index([userId, status])
+  @@index([userId, mode, status])
   @@index([deckId])
   @@index([startedAt])
+  @@map("Session")
+}
+
+model SessionCardState {
+  id               String    @id @default(cuid())
+  sessionId        String
+  cardId           String
+  position         Int
+  isRevealed       Boolean   @default(false)
+  revealedAt       DateTime?
+  revealedByUserId String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  session        CardSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  card           Card        @relation(fields: [cardId], references: [id])
+  revealedByUser User?       @relation(fields: [revealedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, cardId])
+  @@unique([sessionId, position])
+  @@index([sessionId, isRevealed])
+  @@index([cardId])
+  @@index([revealedByUserId])
 }
 
 model SessionAction {
@@ -115,12 +152,134 @@ model SessionAction {
   action    String
   shownAt   DateTime @default(now())
 
-  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  card    Card    @relation(fields: [cardId], references: [id])
+  session CardSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  card    Card        @relation(fields: [cardId], references: [id])
 
   @@index([sessionId])
   @@index([sessionId, action])
   @@index([cardId])
+}
+
+model MultiplayerRoom {
+  id                  String   @id @default(cuid())
+  code                String   @unique
+  deckId              String
+  hostUserId          String?
+  status              String   @default("waiting")
+  currentTurnPlayerId String?
+  turnIndex           Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  deck              Deck         @relation(fields: [deckId], references: [id])
+  hostUser          User?        @relation("HostedMultiplayerRooms", fields: [hostUserId], references: [id], onDelete: SetNull)
+  currentTurnPlayer RoomPlayer?  @relation("CurrentTurnRooms", fields: [currentTurnPlayerId], references: [id], onDelete: SetNull)
+  players           RoomPlayer[] @relation("RoomPlayers")
+  roomCards         RoomCard[]
+
+  @@index([deckId])
+  @@index([hostUserId])
+  @@index([status])
+  @@index([currentTurnPlayerId])
+}
+
+model RoomPlayer {
+  id          String   @id @default(cuid())
+  roomId      String
+  userId      String?
+  displayName String
+  role        String   @default("player")
+  position    Int
+  isActive    Boolean  @default(true)
+  joinedAt    DateTime @default(now())
+
+  room                MultiplayerRoom   @relation("RoomPlayers", fields: [roomId], references: [id], onDelete: Cascade)
+  user                User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  currentTurnForRooms MultiplayerRoom[] @relation("CurrentTurnRooms")
+  revealedRoomCards   RoomCard[]        @relation("RoomCardRevealer")
+
+  @@unique([roomId, position])
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+  @@index([roomId, isActive])
+}
+
+model RoomCard {
+  id                 String    @id @default(cuid())
+  roomId             String
+  cardId             String
+  position           Int
+  isRevealed         Boolean   @default(false)
+  revealedByPlayerId String?
+  revealedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  room             MultiplayerRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  card             Card            @relation(fields: [cardId], references: [id])
+  revealedByPlayer RoomPlayer?     @relation("RoomCardRevealer", fields: [revealedByPlayerId], references: [id], onDelete: SetNull)
+
+  @@unique([roomId, cardId])
+  @@unique([roomId, position])
+  @@index([roomId, isRevealed])
+  @@index([cardId])
+  @@index([revealedByPlayerId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("AuthSession")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
 }
 
 model Favorite {

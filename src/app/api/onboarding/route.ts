@@ -1,5 +1,5 @@
 import { errorResponse, successResponse } from '../../../lib/api-response';
-import { getOrCreateGuestUser } from '../../../lib/auth';
+import { getCurrentUserOrGuest } from '../../../lib/auth';
 import { onboardingPreferenceSchema } from '../../../lib/validators';
 import { getPreference, savePreference } from '../../../services/onboarding.service';
 
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const preference = await getPreference(user.id);
 
     return successResponse(preference);
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const body = onboardingPreferenceSchema.parse(await req.json());
     const preference = await savePreference(user.id, body);
 

@@ -1,5 +1,5 @@
 import { errorResponse, successResponse } from '../../../../../lib/api-response';
-import { getOrCreateGuestUser } from '../../../../../lib/auth';
+import { getCurrentUserOrGuest } from '../../../../../lib/auth';
 import { sessionActionSchema } from '../../../../../lib/validators';
 import { logSessionAction } from '../../../../../services/session.service';
 
@@ -13,7 +13,7 @@ type RouteContext = {
 
 export async function POST(req: Request, context: RouteContext) {
   try {
-    const user = await getOrCreateGuestUser(req);
+    const user = await getCurrentUserOrGuest(req);
     const { sessionId } = await context.params;
     const body = sessionActionSchema.parse(await req.json());
     const session = await logSessionAction(sessionId, user.id, body);

@@ -1,8 +1,29 @@
 import { prisma } from './prisma';
 import { ApiError } from './api-response';
+import { auth } from '../../auth';
 
 export function getAnonymousId(req: Request): string | null {
   return req.headers.get('x-anonymous-id');
+}
+
+export async function getCurrentUser(_req?: Request) {
+  let session = null;
+
+  try {
+    session = await auth();
+  } catch {
+    return null;
+  }
+
+  if (!session?.user?.id) {
+    return null;
+  }
+
+  return prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+  });
 }
 
 export async function getOrCreateGuestUser(req: Request) {
@@ -24,7 +45,39 @@ export async function getOrCreateGuestUser(req: Request) {
   });
 }
 
+export async function getCurrentUserOrGuest(req: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    return currentUser;
+  }
+
+  return getOrCreateGuestUser(req);
+}
+
+export async function requireCurrentUser(req: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    return currentUser;
+  }
+
+  const anonymousId = getAnonymousId(req);
+
+  if (anonymousId) {
+    return getOrCreateGuestUser(req);
+  }
+
+  throw new ApiError(401, 'Authentication required');
+}
+
 export async function getOptionalGuestUser(req: Request) {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    return currentUser;
+  }
+
   const anonymousId = getAnonymousId(req);
 
   if (!anonymousId) {

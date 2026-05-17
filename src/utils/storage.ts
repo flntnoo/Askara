@@ -107,6 +107,7 @@ const mapPreferredTone = (value?: string): PreferredTone | undefined => {
 const migrateLegacySession = (session: NonNullable<GuestData['sessions']>[number]): CardSession => ({
   id: session.id ?? createId('session'),
   deckId: mapLegacyDeckId(session.deckId),
+  mode: 'solo',
   status: session.status ?? 'completed',
   startedAt: toIso(session.startedAt),
   endedAt: session.endedAt ?? (session.completedAt ? toIso(session.completedAt) : undefined),
