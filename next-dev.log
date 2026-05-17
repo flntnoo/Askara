@@ -1,0 +1,158 @@
+   ▲ Next.js 15.3.5
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.137.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.7s
+ ○ Compiling / ...
+ ✓ Compiled / in 7.1s (777 modules)
+ GET / 200 in 7793ms
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 1334ms (799 modules)
+ GET /onboarding 200 in 1475ms
+ GET /onboarding 200 in 39ms
+ ✓ Compiled /home in 421ms (801 modules)
+ GET /home 200 in 500ms
+ ✓ Compiled /decks in 394ms (809 modules)
+ GET /decks 200 in 616ms
+ ✓ Compiled /decks/[slug] in 482ms (823 modules)
+ GET /decks/ldr 200 in 1641ms
+ ○ Compiling /play/[sessionId] ...
+ ✓ Compiled /favorites in 7.6s (1781 modules)
+ GET /play/session_21bf5b3a-3594-414c-97c1-6e66c1c7bca7 200 in 8051ms
+ GET / 200 in 1887ms
+ GET /favorites 200 in 2626ms
+ GET /favorites 200 in 149ms
+ GET /onboarding 200 in 72ms
+ GET /home 200 in 43ms
+ GET /decks 200 in 45ms
+ GET /decks/pdkt 200 in 58ms
+ GET /decks/pdkt 200 in 31ms
+ GET /play/session_65771058-ae76-49c6-b392-e666ba126acd 200 in 40ms
+ ○ Compiling /settings ...
+ ✓ Compiled /settings in 1782ms (1799 modules)
+ GET /settings 200 in 2134ms
+ ○ Compiling /summary/[sessionId] ...
+ ✓ Compiled /summary/[sessionId] in 903ms (1809 modules)
+ GET /summary/session_65771058-ae76-49c6-b392-e666ba126acd 200 in 2217ms
+ GET /home 200 in 42ms
+ GET /decks 200 in 45ms
+ GET /favorites 200 in 32ms
+ GET /decks 200 in 24ms
+ GET /decks/ldr 200 in 191ms
+ GET /favorites 200 in 41ms
+ GET /settings 200 in 30ms
+ GET /home 200 in 58ms
+ GET /play/session_f7fccba7-6b89-42aa-8a50-eb7b0b6f405c 200 in 83ms
+ GET /settings 200 in 63ms
+ GET /decks 200 in 40ms
+ GET /home 200 in 22ms
+ GET /decks/ldr 200 in 110ms
+ GET /decks 200 in 27ms
+ GET /play/session_d446a785-01f5-4474-a3c0-b4e3e5b30034 200 in 52ms
+ GET /decks 200 in 46ms
+ GET /decks/pdkt 200 in 50ms
+ GET /favorites 200 in 83ms
+ GET /home 200 in 32ms
+ GET /favorites 200 in 100ms
+ GET /decks 200 in 27ms
+ GET /settings 200 in 98ms
+ GET /home 200 in 28ms
+ GET /decks 200 in 19ms
+ GET /favorites 200 in 25ms
+ GET /home 200 in 28ms
+ GET /decks/ice-breaker 200 in 48ms
+ GET /play/session_0cfca77f-83ca-45bb-93e7-abb221fc74a5 200 in 57ms
+ GET /decks/ldr 200 in 139ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1476ms (1790 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1816ms
+ GET /decks/ldr 200 in 158ms
+ GET /play/session_2e8d0f32-dbfd-4ae9-8a9b-203b22c4e211 200 in 63ms
+ ✓ Compiled in 1759ms (1795 modules)
+ GET /play/session_0cfca77f-83ca-45bb-93e7-abb221fc74a5 200 in 448ms
+ ✓ Compiled in 636ms (851 modules)
+ GET /play/session_0cfca77f-83ca-45bb-93e7-abb221fc74a5 200 in 54ms
+ GET /decks/ldr 200 in 249ms
+ GET /decks/ldr 200 in 190ms
+ GET /play/session_7e017cf0-2fa6-42de-bbcd-ace54c1ed6b6 200 in 57ms
+ GET /decks/ldr 200 in 101ms
+ ✓ Compiled /summary/[sessionId] in 383ms (948 modules)
+ GET /summary/session_0cfca77f-83ca-45bb-93e7-abb221fc74a5 200 in 500ms
+ GET /decks/ldr 200 in 241ms
+ GET /play/session_81c9f791-55fd-45fe-bd44-423243858a82 200 in 75ms
+ ✓ Compiled /home in 397ms (945 modules)
+ GET /home 200 in 490ms
+ GET /favorites 200 in 27ms
+ GET /home 200 in 23ms
+ GET /favorites 200 in 48ms
+ ✓ Compiled /settings in 440ms (951 modules)
+ GET /settings 200 in 582ms
+ ○ Compiling /decks ...
+ ✓ Compiled /decks in 588ms (957 modules)
+ GET /decks 200 in 720ms
+ GET /home 200 in 162ms
+ GET /decks/pdkt 200 in 47ms
+ GET /play/session_0395f208-7700-4e91-ae4a-9a88d4c20b47 200 in 62ms
+ GET /summary/session_0395f208-7700-4e91-ae4a-9a88d4c20b47 200 in 50ms
+ GET /home 200 in 34ms
+ GET /decks 200 in 40ms
+ ○ Compiling /_error ...
+ GET /decks 200 in 969ms
+ GET /home 200 in 534ms
+ ✓ Compiled /_error in 4.9s (2139 modules)
+ GET /favorites 500 in 6622ms
+ GET /settings 500 in 5801ms
+ GET /home 200 in 1165ms
+ GET /home 200 in 164ms
+ GET /settings 200 in 171ms
+ GET /favorites 200 in 174ms
+ GET /decks/konflik 200 in 184ms
+ GET /favorites 200 in 156ms
+ GET /decks/konflik 200 in 79ms
+ GET /favorites 200 in 63ms
+ GET /favorites 200 in 24ms
+ GET /decks/konflik 500 in 1214ms
+ GET /decks/apresiasi 500 in 764ms
+ GET /settings 200 in 24ms
+ ○ Compiling / ...
+ ✓ Compiled / in 610ms (996 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 537ms (2119 modules)
+ GET / 500 in 5699ms
+ GET / 200 in 265ms
+ ✓ Compiled /_not-found in 354ms (1041 modules)
+ GET /_next/static/css/app/layout.css?v=1778990723765 404 in 547ms
+ GET /_next/static/chunks/webpack.js?v=1778990723765 404 in 565ms
+ GET /_next/static/chunks/main-app.js?v=1778990723765 404 in 225ms
+ GET /_next/static/chunks/app/page.js 404 in 224ms
+ GET /_next/static/chunks/app/not-found.js 404 in 220ms
+ GET /_next/static/chunks/app/layout.js 404 in 225ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 225ms
+ ✓ Compiled /onboarding in 426ms (1049 modules)
+ GET /onboarding 200 in 601ms
+ GET /_next/static/css/app/layout.css?v=1778990725800 404 in 84ms
+ GET /_next/static/chunks/webpack.js?v=1778990725800 404 in 107ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 201ms
+ GET /_next/static/chunks/app/not-found.js 404 in 200ms
+ GET /_next/static/chunks/app/layout.js 404 in 206ms
+ GET /_next/static/chunks/main-app.js?v=1778990725800 404 in 210ms
+ GET /_next/static/chunks/app/onboarding/page.js 404 in 206ms
+ GET /decks 500 in 187ms
+ GET /settings 500 in 97ms
+ GET /onboarding 200 in 122ms
+ GET /_next/static/css/app/layout.css?v=1778990869095 404 in 236ms
+ GET /_next/static/chunks/webpack.js?v=1778990869095 404 in 299ms
+ GET /_next/static/chunks/app/layout.js 404 in 456ms
+ GET /_next/static/chunks/app/not-found.js 404 in 545ms
+ GET /_next/static/chunks/app/onboarding/page.js 404 in 542ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 558ms
+ GET /_next/static/chunks/main-app.js?v=1778990869095 404 in 566ms
+ GET /onboarding 200 in 83ms
+ GET /_next/static/css/app/layout.css?v=1778990870577 404 in 107ms
+ GET /_next/static/chunks/webpack.js?v=1778990870577 404 in 137ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 239ms
+ GET /_next/static/chunks/app/layout.js 404 in 249ms
+ GET /_next/static/chunks/app/not-found.js 404 in 259ms
+ GET /_next/static/chunks/app/onboarding/page.js 404 in 268ms
+ GET /_next/static/chunks/main-app.js?v=1778990870577 404 in 277ms

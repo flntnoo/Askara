@@ -1,0 +1,340 @@
+ ⨯ Error: Cannot find module './488.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\app\favorites\page.js:1:14411)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\app\favorites\page.js:1:14456) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/favorites'
+}
+ ⨯ Error: Cannot find module './488.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\app\settings\page.js:1:11893)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\app\settings\page.js:1:11938) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/settings'
+}
+ ⨯ Failed to generate static paths for /decks/[slug]:
+[Error: Cannot find module './vendor-chunks/lucide-react@0.487.0_react@18.3.1.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\[slug]\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Failed to generate static paths for /decks/[slug]:
+[Error: Cannot find module './vendor-chunks/lucide-react@0.487.0_react@18.3.1.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\[slug]\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ [Error: Cannot find module './vendor-chunks/lucide-react@0.487.0_react@18.3.1.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\[slug]\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/decks/apresiasi'
+}
+ ⨯ [Error: Cannot find module './vendor-chunks/lucide-react@0.487.0_react@18.3.1.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\decks\[slug]\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\dev\static-paths-worker.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\compiled\jest-worker\processChild.js] {
+  type: 'Error',
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/decks/apresiasi'
+}
+[Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\client-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\client-development\\5.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\client-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\client-development\\5.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\client-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\client-development\\5.pack.gz'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\client-development\5.pack.gz'
+[Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\2.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\2.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\2.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\2.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\2.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\2.pack.gz'
+}
+[Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\3.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\3.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\3.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\3.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\3.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\3.pack.gz'
+}
+[Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\4.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\4.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\4.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\4.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\4.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\4.pack.gz'
+}
+[Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\5.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\5.pack.gz'
+}
+ ⨯ unhandledRejection:  [Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\5.pack.gz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: 'C:\\Users\\Falen\\Downloads\\Convo\\.next\\cache\\webpack\\server-development\\5.pack.gz'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, stat 'C:\Users\Falen\Downloads\Convo\.next\cache\webpack\server-development\2.pack.gz'
+ ⨯ TypeError: __webpack_modules__[moduleId] is not a function
+    at Object.__webpack_require__ [as require] (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:33:42)
+    at JSON.parse (<anonymous>) {
+  digest: '1525124911'
+}
+TypeError: __webpack_modules__[moduleId] is not a function
+    at Object.__webpack_require__ [as require] (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:33:42)
+    at JSON.parse (<anonymous>)
+ ⨯ TypeError: __webpack_modules__[moduleId] is not a function
+    at Object.__webpack_require__ [as require] (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:33:42)
+    at JSON.parse (<anonymous>) {
+  page: '/'
+}
+ ⨯ Error: Cannot find module './936.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:335)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:376) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './488.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\onboarding\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\app\decks\page.js:1:14760)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\app\decks\page.js:1:14801) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/decks'
+}
+ ⨯ Error: Cannot find module './936.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\onboarding\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:335)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:376) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './488.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\onboarding\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\app\settings\page.js:1:11893)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\app\settings\page.js:1:11938) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/settings'
+}
+ ⨯ Error: Cannot find module './936.js'
+Require stack:
+- C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js
+- C:\Users\Falen\Downloads\Convo\.next\server\app\onboarding\page.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\require.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\load-components.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\utils.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\options.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\swc\index.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\parse-module.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\build\analysis\get-page-static-info.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Falen\Downloads\Convo\node_modules\.pnpm\next@15.3.5_@babel+core@7.2_a1ddd6b4f8f4ab13cc8e4f24cb37adb6\node_modules\next\dist\server\lib\start-server.js
+    at __webpack_require__.f.require (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:198:28)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Falen\Downloads\Convo\.next\server\webpack-runtime.js:162:22)
+    at <unknown> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:335)
+    at Object.<anonymous> (C:\Users\Falen\Downloads\Convo\.next\server\pages\_document.js:1:376) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
