@@ -14,8 +14,10 @@ import {
   UsersRound,
   X,
 } from 'lucide-react';
+import RoomJoinForm from '../components/RoomJoinForm';
 import { apiRequest } from '../../lib/api-client';
 import type { MultiplayerRoom, RoomCardState } from '../../types';
+import { saveJoinedRoomPlayer } from '../../utils/storage';
 
 export default function RoomBoardPage() {
   const { code } = useParams<{ code: string }>();
@@ -37,6 +39,21 @@ export default function RoomBoardPage() {
 
     try {
       const nextRoom = await apiRequest<MultiplayerRoom>(`/api/rooms/${code.toUpperCase()}`);
+
+      if (nextRoom.currentPlayerId) {
+        saveJoinedRoomPlayer(nextRoom.code, nextRoom.currentPlayerId);
+      }
+
+      if (nextRoom.status === 'waiting') {
+        if (nextRoom.currentPlayerId) {
+          router.replace(`/room/${nextRoom.code}/lobby`);
+        } else {
+          setRoom(nextRoom);
+        }
+
+        return;
+      }
+
       setRoom(nextRoom);
       setSelectedCard((current) => current ?? nextRoom.latestRevealedCard ?? null);
     } catch (loadError) {
@@ -45,7 +62,7 @@ export default function RoomBoardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [code]);
+  }, [code, router]);
 
   useEffect(() => {
     void loadRoom();
@@ -159,6 +176,23 @@ export default function RoomBoardPage() {
     );
   }
 
+  if (!room.currentPlayerId) {
+    return (
+      <RoomJoinForm
+        code={room.code}
+        room={room}
+        onJoined={(joinedRoom) => {
+          if (joinedRoom.status === 'waiting') {
+            router.replace(`/room/${joinedRoom.code}/lobby`);
+            return;
+          }
+
+          setRoom(joinedRoom);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b]">
       <header className="border-b-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 py-4 md:px-8">
@@ -210,7 +244,7 @@ export default function RoomBoardPage() {
                 Multiplayer Room
               </h1>
               <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[#58413c]">
-                {remainingCount} remaining · {revealedCount} opened
+                {remainingCount} remaining / {revealedCount} opened
               </p>
             </div>
             {isComplete && (
@@ -248,7 +282,8 @@ export default function RoomBoardPage() {
             </button>
           </div>
 
-          {unrevealedCards.length > 0 ? (
+          {room.status === 'active' ? (
+            unrevealedCards.length > 0 ? (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
               {unrevealedCards.map((card) => {
                 const showBusy = isRevealing === card.id;
@@ -278,11 +313,19 @@ export default function RoomBoardPage() {
                 );
               })}
             </div>
-          ) : (
+            ) : (
             <div className="flex min-h-[260px] flex-col items-center justify-center border-4 border-[#1c1b1b] bg-white p-8 text-center shadow-[6px_6px_0px_#1c1b1b]">
               <Trophy className="mb-4 h-10 w-10 text-[#a93718]" />
               <h2 className="font-['Hanken_Grotesk',sans-serif] text-2xl font-extrabold">
                 Semua kartu sudah terbuka
+              </h2>
+            </div>
+            )
+          ) : (
+            <div className="flex min-h-[260px] flex-col items-center justify-center border-4 border-[#1c1b1b] bg-white p-8 text-center shadow-[6px_6px_0px_#1c1b1b]">
+              <Trophy className="mb-4 h-10 w-10 text-[#a93718]" />
+              <h2 className="font-['Hanken_Grotesk',sans-serif] text-2xl font-extrabold">
+                Room sudah selesai
               </h2>
             </div>
           )}

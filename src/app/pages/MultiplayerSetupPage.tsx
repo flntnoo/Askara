@@ -2,21 +2,35 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { ArrowLeft, Loader2, LogIn, Plus, UsersRound } from 'lucide-react';
 import { getDeckBySlug } from '../../data/decks';
 import { apiRequest } from '../../lib/api-client';
 import type { MultiplayerRoom } from '../../types';
+import { saveJoinedRoomPlayer } from '../../utils/storage';
 
 export default function MultiplayerSetupPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
+  const { data: session } = useSession();
   const deck = slug ? getDeckBySlug(slug) : undefined;
-  const [displayName, setDisplayName] = useState('');
+  const [hostName, setHostName] = useState('');
+  const [joinDisplayName, setJoinDisplayName] = useState('');
+  const [hasEditedHostName, setHasEditedHostName] = useState(false);
+  const [hasEditedJoinName, setHasEditedJoinName] = useState(false);
   const [roomCode, setRoomCode] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const sessionName = session?.user?.name?.trim();
+
+    if (!sessionName) return;
+    if (!hasEditedHostName) setHostName(sessionName);
+    if (!hasEditedJoinName) setJoinDisplayName(sessionName);
+  }, [hasEditedHostName, hasEditedJoinName, session?.user?.name]);
 
   if (!deck) {
     return (
@@ -35,7 +49,14 @@ export default function MultiplayerSetupPage() {
   }
 
   const createRoom = async () => {
+    const trimmedHostName = hostName.trim();
+
     if (isCreating) return;
+
+    if (!trimmedHostName) {
+      setError('Masukkan host name terlebih dahulu.');
+      return;
+    }
 
     setIsCreating(true);
     setError(null);
@@ -45,11 +66,15 @@ export default function MultiplayerSetupPage() {
         method: 'POST',
         body: JSON.stringify({
           deckId: deck.id,
-          displayName: displayName.trim() || undefined,
+          displayName: trimmedHostName,
         }),
       });
 
-      router.push(`/room/${room.code}`);
+      if (room.currentPlayerId) {
+        saveJoinedRoomPlayer(room.code, room.currentPlayerId);
+      }
+
+      router.push(`/room/${room.code}/lobby`);
     } catch (createError) {
       console.error('Failed to create multiplayer room:', createError);
       setError('Room belum bisa dibuat. Coba lagi sebentar.');
@@ -61,9 +86,15 @@ export default function MultiplayerSetupPage() {
     event.preventDefault();
 
     const normalizedCode = roomCode.trim().toUpperCase();
+    const trimmedDisplayName = joinDisplayName.trim();
 
     if (!normalizedCode || isJoining) {
       setError('Masukkan room code terlebih dahulu.');
+      return;
+    }
+
+    if (!trimmedDisplayName) {
+      setError('Masukkan display name terlebih dahulu.');
       return;
     }
 
@@ -74,14 +105,18 @@ export default function MultiplayerSetupPage() {
       const room = await apiRequest<MultiplayerRoom>(`/api/rooms/${normalizedCode}/join`, {
         method: 'POST',
         body: JSON.stringify({
-          displayName: displayName.trim() || undefined,
+          displayName: trimmedDisplayName,
         }),
       });
 
-      router.push(`/room/${room.code}`);
+      if (room.currentPlayerId) {
+        saveJoinedRoomPlayer(room.code, room.currentPlayerId);
+      }
+
+      router.push(`/room/${room.code}/lobby`);
     } catch (joinError) {
       console.error('Failed to join multiplayer room:', joinError);
-      setError('Room code tidak valid atau room sudah selesai.');
+      setError('Room code tidak valid atau game sudah dimulai.');
       setIsJoining(false);
     }
   };
@@ -133,11 +168,14 @@ export default function MultiplayerSetupPage() {
               Display name
             </label>
             <input
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
+              value={hostName}
+              onChange={(event) => {
+                setHasEditedHostName(true);
+                setHostName(event.target.value);
+              }}
               maxLength={40}
               className="mb-4 min-h-11 w-full rounded-lg border-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 font-['Hanken_Grotesk',sans-serif] font-bold outline-none focus:ring-4 focus:ring-[#ff7551]"
-              placeholder="Host"
+              placeholder="Aldo"
             />
             <button
               type="button"
@@ -168,6 +206,19 @@ export default function MultiplayerSetupPage() {
               maxLength={12}
               className="mb-4 min-h-11 w-full rounded-lg border-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 font-['Hanken_Grotesk',sans-serif] text-xl font-extrabold tracking-[0.16em] outline-none focus:ring-4 focus:ring-[#ff7551]"
               placeholder="ABC123"
+            />
+            <label className="mb-2 block font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#58413c]">
+              Display name
+            </label>
+            <input
+              value={joinDisplayName}
+              onChange={(event) => {
+                setHasEditedJoinName(true);
+                setJoinDisplayName(event.target.value);
+              }}
+              maxLength={40}
+              className="mb-4 min-h-11 w-full rounded-lg border-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 font-['Hanken_Grotesk',sans-serif] font-bold outline-none focus:ring-4 focus:ring-[#ff7551]"
+              placeholder="Maya"
             />
             <button
               type="submit"

@@ -18,6 +18,7 @@ export const STORAGE_KEYS = {
   sessionHistory: 'dcc_session_history',
   favorites: 'dcc_favorites',
   settings: 'dcc_settings',
+  roomPlayers: 'dcc_room_players',
 } as const;
 
 const isBrowser = () => typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -230,4 +231,31 @@ export function getSettings<T extends Record<string, unknown> = Record<string, u
 
 export function saveSettings<T extends Record<string, unknown>>(settings: T): void {
   writeKey(STORAGE_KEYS.settings, settings);
+}
+
+type JoinedRoomPlayer = {
+  playerId: string;
+  joinedAt: string;
+};
+
+type JoinedRoomPlayers = Record<string, JoinedRoomPlayer>;
+
+const normalizeRoomCode = (code: string) => code.trim().toUpperCase();
+
+export function getJoinedRoomPlayer(roomCode: string): JoinedRoomPlayer | null {
+  const players = readKey<JoinedRoomPlayers>(STORAGE_KEYS.roomPlayers, {});
+  return players[normalizeRoomCode(roomCode)] ?? null;
+}
+
+export function saveJoinedRoomPlayer(roomCode: string, playerId: string): void {
+  if (!playerId) return;
+
+  const players = readKey<JoinedRoomPlayers>(STORAGE_KEYS.roomPlayers, {});
+  writeKey(STORAGE_KEYS.roomPlayers, {
+    ...players,
+    [normalizeRoomCode(roomCode)]: {
+      playerId,
+      joinedAt: new Date().toISOString(),
+    },
+  });
 }

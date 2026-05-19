@@ -156,6 +156,9 @@ export type MultiplayerRoom = {
   players: RoomPlayer[];
   cards: RoomCardState[];
   latestRevealedCard?: RoomCardState | null;
+  currentPlayerId?: string;
+  currentPlayerRole?: RoomPlayer['role'];
+  isCurrentUserHost?: boolean;
 };
 
 export type RelationshipType = 'partner' | 'pdkt' | 'friend' | 'family' | 'self';

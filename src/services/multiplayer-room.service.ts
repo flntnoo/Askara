@@ -102,7 +102,10 @@ async function getRoomRecordOrThrow(code: string) {
   return room;
 }
 
-function serializeRoom(room: RoomRecord): MultiplayerRoom {
+function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom {
+  const currentPlayer = viewerUserId
+    ? room.players.find((player) => player.userId === viewerUserId && player.isActive)
+    : undefined;
   const cards = room.roomCards.map((state) => ({
     id: state.id,
     roomId: state.roomId,
@@ -143,6 +146,11 @@ function serializeRoom(room: RoomRecord): MultiplayerRoom {
     })),
     cards,
     latestRevealedCard,
+    currentPlayerId: currentPlayer?.id,
+    currentPlayerRole: currentPlayer?.role as 'host' | 'player' | undefined,
+    isCurrentUserHost: Boolean(
+      currentPlayer?.role === 'host' || (viewerUserId && room.hostUserId === viewerUserId),
+    ),
   };
 }
 
@@ -157,6 +165,12 @@ async function getPlayerForUser(roomId: string, userId: string) {
 }
 
 export async function createMultiplayerRoom(userId: string, deckId: string, displayName?: string) {
+  const trimmedDisplayName = displayName?.trim();
+
+  if (!trimmedDisplayName) {
+    throw new ApiError(400, 'Display name is required');
+  }
+
   const deck = await prisma.deck.findFirst({
     where: {
       id: deckId,
@@ -188,15 +202,15 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
         code,
         deckId,
         hostUserId: userId,
-        status: 'active',
+        status: 'waiting',
       },
     });
 
-    const hostPlayer = await tx.roomPlayer.create({
+    await tx.roomPlayer.create({
       data: {
         roomId: room.id,
         userId,
-        displayName: displayName?.trim() || 'Host',
+        displayName: trimmedDisplayName,
         role: 'host',
         position: 0,
       },
@@ -209,26 +223,26 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
         position,
       })),
     });
-
-    await tx.multiplayerRoom.update({
-      where: {
-        id: room.id,
-      },
-      data: {
-        currentTurnPlayerId: hostPlayer.id,
-      },
-    });
   });
 
-  return getMultiplayerRoom(code);
+  return getMultiplayerRoom(code, userId);
 }
 
 export async function joinMultiplayerRoom(code: string, userId: string, displayName?: string) {
   const normalizedCode = normalizeRoomCode(code);
+  const trimmedDisplayName = displayName?.trim();
+
+  if (!trimmedDisplayName) {
+    throw new ApiError(400, 'Display name is required');
+  }
+
   const room = await getRoomRecordOrThrow(normalizedCode);
 
-  if (room.status === 'completed') {
-    throw new ApiError(409, 'Room has already ended');
+  if (room.status !== 'waiting') {
+    throw new ApiError(
+      409,
+      room.status === 'active' ? 'Game already started' : 'Room has already ended',
+    );
   }
 
   const existingPlayer = await prisma.roomPlayer.findFirst({
@@ -245,11 +259,11 @@ export async function joinMultiplayerRoom(code: string, userId: string, displayN
       },
       data: {
         isActive: true,
-        ...(displayName?.trim() ? { displayName: displayName.trim() } : {}),
+        displayName: trimmedDisplayName,
       },
     });
 
-    return getMultiplayerRoom(normalizedCode);
+    return getMultiplayerRoom(normalizedCode, userId);
   }
 
   const nextPosition =
@@ -259,25 +273,70 @@ export async function joinMultiplayerRoom(code: string, userId: string, displayN
     data: {
       roomId: room.id,
       userId,
-      displayName: displayName?.trim() || `Player ${nextPosition + 1}`,
+      displayName: trimmedDisplayName,
       role: 'player',
       position: nextPosition,
     },
   });
 
-  return getMultiplayerRoom(normalizedCode);
+  return getMultiplayerRoom(normalizedCode, userId);
 }
 
-export async function getMultiplayerRoom(code: string) {
+export async function getMultiplayerRoom(code: string, viewerUserId?: string) {
   const room = await getRoomRecordOrThrow(code);
-  return serializeRoom(room);
+  return serializeRoom(room, viewerUserId);
+}
+
+export async function startMultiplayerRoom(code: string, userId: string) {
+  const room = await getRoomRecordOrThrow(code);
+  const player = await getPlayerForUser(room.id, userId);
+
+  if (!player) {
+    throw new ApiError(403, 'Join the room before starting it');
+  }
+
+  if (room.hostUserId !== userId && player.role !== 'host') {
+    throw new ApiError(403, 'Only the host can start this room');
+  }
+
+  if (room.status !== 'waiting') {
+    throw new ApiError(
+      409,
+      room.status === 'active' ? 'Game already started' : 'Room has already ended',
+    );
+  }
+
+  const activePlayers = room.players.filter((item) => item.isActive);
+
+  if (activePlayers.length < 2) {
+    throw new ApiError(409, 'At least 2 active players are required to start');
+  }
+
+  const firstPlayer = activePlayers.find((item) => item.role === 'host') ?? activePlayers[0];
+  const turnIndex = Math.max(
+    0,
+    activePlayers.findIndex((item) => item.id === firstPlayer.id),
+  );
+
+  await prisma.multiplayerRoom.update({
+    where: {
+      id: room.id,
+    },
+    data: {
+      status: 'active',
+      currentTurnPlayerId: firstPlayer.id,
+      turnIndex,
+    },
+  });
+
+  return getMultiplayerRoom(room.code, userId);
 }
 
 export async function revealRoomCard(code: string, userId: string, roomCardId: string) {
   const room = await getRoomRecordOrThrow(code);
 
   if (room.status !== 'active') {
-    throw new ApiError(409, 'Room is not active');
+    throw new ApiError(400, 'Room is not active');
   }
 
   const player = await getPlayerForUser(room.id, userId);
@@ -318,7 +377,7 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
     throw new ApiError(409, 'Card is already revealed');
   }
 
-  return getMultiplayerRoom(room.code);
+  return getMultiplayerRoom(room.code, userId);
 }
 
 export async function moveRoomToNextTurn(code: string, userId: string) {
@@ -352,7 +411,7 @@ export async function moveRoomToNextTurn(code: string, userId: string) {
     },
   });
 
-  return getMultiplayerRoom(room.code);
+  return getMultiplayerRoom(room.code, userId);
 }
 
 export async function endMultiplayerRoom(code: string, userId: string) {
@@ -376,5 +435,5 @@ export async function endMultiplayerRoom(code: string, userId: string) {
     },
   });
 
-  return getMultiplayerRoom(room.code);
+  return getMultiplayerRoom(room.code, userId);
 }

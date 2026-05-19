@@ -29,11 +29,19 @@ export const revealTableCardSchema = z.object({
 
 export const createRoomSchema = z.object({
   deckId: z.string().min(1),
-  displayName: z.string().trim().min(1).max(40).optional(),
+  displayName: z
+    .string({ required_error: 'Display name is required' })
+    .trim()
+    .min(1, 'Display name is required')
+    .max(40),
 });
 
 export const joinRoomSchema = z.object({
-  displayName: z.string().trim().min(1).max(40).optional(),
+  displayName: z
+    .string({ required_error: 'Display name is required' })
+    .trim()
+    .min(1, 'Display name is required')
+    .max(40),
 });
 
 export const updateSessionSchema = z.object({
