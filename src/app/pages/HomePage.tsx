@@ -3,22 +3,28 @@
 import Link from 'next/link';
 import { Play, Heart, Sparkles } from 'lucide-react';
 import { getActiveSession, getFavorites, getOnboardingPreference } from '../../utils/storage';
-import { getAllDecks } from '../../data/decks';
+import { getAllDecks, getDeckCategoryLabel } from '../../data/decks';
 import { useEffect, useState } from 'react';
 import { CardSession } from '../../types';
 import { getRecommendedDecks } from '../../utils/recommendationEngine';
+import { useFavoriteStore } from '../../stores/favoriteStore';
+import { useOnboardingStore } from '../../stores/onboardingStore';
 
 export default function HomePage() {
   const [activeSession, setActiveSession] = useState<CardSession | null>(null);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [onboarding, setOnboarding] = useState(getOnboardingPreference());
+  const hydrateFavorites = useFavoriteStore((state) => state.hydrateFavorites);
+  const hydrateOnboarding = useOnboardingStore((state) => state.hydrateOnboarding);
   const allDecks = getAllDecks();
 
   useEffect(() => {
     setActiveSession(getActiveSession());
     setFavoriteCount(getFavorites().length);
     setOnboarding(getOnboardingPreference());
-  }, []);
+    void hydrateFavorites().then((favorites) => setFavoriteCount(favorites.length));
+    void hydrateOnboarding().then((preference) => setOnboarding(preference));
+  }, [hydrateFavorites, hydrateOnboarding]);
 
   const recommendedDecks = getRecommendedDecks(allDecks, onboarding);
 
@@ -53,7 +59,7 @@ export default function HomePage() {
                   {activeSession.viewedCardIds.length} kartu sudah dibuka
                 </p>
               </div>
-              <div className="text-[#a93718]">→</div>
+              <div className="text-[#a93718]">&rarr;</div>
             </div>
           </Link>
         )}
@@ -76,7 +82,7 @@ export default function HomePage() {
                   {favoriteCount} kartu tersimpan
                 </p>
               </div>
-              <div className="text-[#a93718]">→</div>
+              <div className="text-[#a93718]">&rarr;</div>
             </div>
           </Link>
         )}
@@ -102,15 +108,18 @@ export default function HomePage() {
                 >
                   {deck.icon}
                 </div>
-                <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-2">
+                <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-1">
                   {deck.name}
                 </h3>
+                <div className="font-['Hanken_Grotesk',sans-serif] font-bold text-xs uppercase tracking-[0.08em] text-[#a93718] mb-2">
+                  {getDeckCategoryLabel(deck.category)}
+                </div>
                 <p className="font-['Hanken_Grotesk',sans-serif] font-normal text-sm text-[#58413c] mb-3">
                   {deck.shortDescription}
                 </p>
                 <div className="flex items-center gap-2 text-xs text-[#58413c] font-['Hanken_Grotesk',sans-serif]">
                   <span>{deck.cardCount} kartu</span>
-                  <span>•</span>
+                  <span>&bull;</span>
                   <span>{deck.estimatedDuration}</span>
                 </div>
               </Link>
@@ -125,7 +134,7 @@ export default function HomePage() {
             className="inline-flex items-center gap-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#a93718] hover:underline"
           >
             Lihat Semua Deck
-            <span>→</span>
+            <span>&rarr;</span>
           </Link>
         </div>
       </div>

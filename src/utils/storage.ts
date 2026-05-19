@@ -218,7 +218,7 @@ export function saveFavorites(cardIds: string[]): void {
 }
 
 export function resetFavorites(): void {
-  writeKey(STORAGE_KEYS.favorites, []);
+  removeKey(STORAGE_KEYS.favorites);
 }
 
 export function resetAllData(): void {

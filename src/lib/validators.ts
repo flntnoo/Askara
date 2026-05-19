@@ -12,7 +12,7 @@ export const deckCategorySchema = z.enum([
   'masa-depan',
 ]);
 
-export const sessionStatusSchema = z.enum(['active', 'completed', 'abandoned']);
+export const sessionStatusSchema = z.enum(['active', 'completed', 'abandoned', 'expired']);
 export const cardActionSchema = z.enum(['viewed', 'skipped', 'favorited', 'unfavorited']);
 
 export const createSessionSchema = z.object({

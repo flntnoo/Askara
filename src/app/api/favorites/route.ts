@@ -1,7 +1,7 @@
-import { ApiError, errorResponse, successResponse } from '../../../lib/api-response';
+import { errorResponse, successResponse } from '../../../lib/api-response';
 import { getCurrentUserOrGuest } from '../../../lib/auth';
 import { favoriteSchema } from '../../../lib/validators';
-import { addFavorite, getFavorites, removeFavorite } from '../../../services/favorite.service';
+import { addFavorite, clearFavorites, getFavorites, removeFavorite } from '../../../services/favorite.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +35,8 @@ export async function DELETE(req: Request) {
     const cardId = searchParams.get('cardId');
 
     if (!cardId) {
-      throw new ApiError(400, 'Missing cardId query parameter');
+      const favorites = await clearFavorites(user.id);
+      return successResponse(favorites);
     }
 
     const favorites = await removeFavorite(user.id, cardId);

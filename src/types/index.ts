@@ -69,7 +69,7 @@ export type ConversationCard = {
   sortOrder: number;
 };
 
-export type SessionStatus = 'active' | 'completed' | 'abandoned';
+export type SessionStatus = 'active' | 'completed' | 'abandoned' | 'expired';
 
 export type SessionMode = 'solo' | 'table' | 'multiplayer';
 
@@ -88,6 +88,7 @@ export type CardSession = {
   status: SessionStatus;
   startedAt: string;
   endedAt?: string;
+  expiresAt?: string;
   currentCardId?: string;
   viewedCardIds: string[];
   skippedCardIds: string[];
@@ -113,11 +114,12 @@ export type TableSession = {
   status: SessionStatus;
   startedAt: string;
   endedAt?: string;
+  expiresAt?: string;
   deck: Deck;
   cards: TableCardState[];
 };
 
-export type MultiplayerRoomStatus = 'waiting' | 'active' | 'completed';
+export type MultiplayerRoomStatus = 'waiting' | 'active' | 'completed' | 'abandoned' | 'expired';
 
 export type RoomPlayer = {
   id: string;
@@ -152,6 +154,9 @@ export type MultiplayerRoom = {
   turnIndex: number;
   createdAt: string;
   updatedAt: string;
+  startedAt?: string;
+  endedAt?: string;
+  expiresAt?: string;
   deck: Deck;
   players: RoomPlayer[];
   cards: RoomCardState[];

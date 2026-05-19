@@ -1,7 +1,7 @@
 import { errorResponse, successResponse } from '../../../lib/api-response';
 import { getCurrentUserOrGuest } from '../../../lib/auth';
 import { onboardingPreferenceSchema } from '../../../lib/validators';
-import { getPreference, savePreference } from '../../../services/onboarding.service';
+import { getPreference, resetPreference, savePreference } from '../../../services/onboarding.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +23,17 @@ export async function POST(req: Request) {
     const preference = await savePreference(user.id, body);
 
     return successResponse(preference, { status: 201 });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const user = await getCurrentUserOrGuest(req);
+    const preference = await resetPreference(user.id);
+
+    return successResponse(preference);
   } catch (error) {
     return errorResponse(error);
   }

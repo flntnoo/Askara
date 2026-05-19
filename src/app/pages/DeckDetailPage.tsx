@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Play, UsersRound } from 'lucide-react';
-import { getDeckBySlug } from '../../data/decks';
+import { getDeckBySlug, getDeckCategoryLabel } from '../../data/decks';
 import { getCardsByDeckId } from '../../data/cards';
 import { useSessionStore } from '../../stores/sessionStore';
 
@@ -67,6 +67,9 @@ export default function DeckDetailPage() {
           <h1 className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[40px] md:text-[56px] text-[#1c1b1b] mb-4 tracking-[-1.12px]">
             {deck.name}
           </h1>
+          <div className="inline-flex border-2 border-[#1c1b1b] bg-white rounded-lg px-3 py-1 mb-4 font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#a93718]">
+            {getDeckCategoryLabel(deck.category)}
+          </div>
           <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[18px] md:text-[20px] text-[#58413c] mb-6 max-w-2xl">
             {deck.description}
           </p>
@@ -74,10 +77,7 @@ export default function DeckDetailPage() {
           {/* Deck Meta */}
           <div className="flex flex-wrap gap-4 mb-8">
             <div className="bg-white border-2 border-[#1c1b1b] rounded-lg px-4 py-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b]">
-              {deck.cardCount} kartu
-            </div>
-            <div className="bg-white border-2 border-[#1c1b1b] rounded-lg px-4 py-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b]">
-              {deck.estimatedDuration ?? `${deck.estimatedMinutes} menit`}
+              {deck.cardCount} kartu &bull; {deck.estimatedDuration ?? `${deck.estimatedMinutes} menit`}
             </div>
           </div>
 
@@ -150,26 +150,6 @@ export default function DeckDetailPage() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* CTA Bottom */}
-        <div className="text-center">
-          <div className="inline-flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={handleStartDeck}
-              className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all inline-flex items-center justify-center gap-3"
-            >
-              <Play className="w-5 h-5" fill="#6b1500" />
-              Mulai Deck Ini
-            </button>
-            <button
-              onClick={handleStartMultiplayer}
-              className="bg-white drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all inline-flex items-center justify-center gap-3"
-            >
-              <UsersRound className="w-5 h-5" />
-              Play Multiplayer
-            </button>
           </div>
         </div>
       </div>

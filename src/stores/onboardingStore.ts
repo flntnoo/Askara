@@ -10,10 +10,13 @@ import {
 import { OnboardingPreference } from '../types';
 import { apiRequest } from '../lib/api-client';
 
+let onboardingSyncVersion = 0;
+
 type OnboardingStore = {
   preference: OnboardingPreference | null;
   savePreference: (preference: OnboardingPreference) => void;
-  resetOnboarding: () => void;
+  resetOnboarding: () => Promise<void>;
+  hydrateOnboarding: () => Promise<OnboardingPreference | null>;
   completeOnboarding: () => void;
   refreshPreference: () => void;
 };
@@ -21,6 +24,7 @@ type OnboardingStore = {
 export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
   preference: null,
   savePreference: (preference) => {
+    const syncVersion = ++onboardingSyncVersion;
     getOrCreateAnonymousUser();
     saveOnboardingPreference(preference);
     set({ preference });
@@ -29,6 +33,8 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
       body: JSON.stringify(preference),
     })
       .then((remotePreference) => {
+        if (syncVersion !== onboardingSyncVersion) return;
+
         saveOnboardingPreference(remotePreference);
         set({ preference: remotePreference });
       })
@@ -36,11 +42,22 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
         console.error('Failed to sync onboarding preference:', error);
       });
   },
-  resetOnboarding: () => {
+  resetOnboarding: async () => {
+    const syncVersion = ++onboardingSyncVersion;
+    clearStoredOnboarding();
+    set({ preference: null });
+
+    await apiRequest<null>('/api/onboarding', {
+      method: 'DELETE',
+    });
+
+    if (syncVersion !== onboardingSyncVersion) return;
+
     clearStoredOnboarding();
     set({ preference: null });
   },
   completeOnboarding: () => {
+    const syncVersion = ++onboardingSyncVersion;
     const next = {
       ...(get().preference ?? {}),
       completedOnboarding: true,
@@ -52,6 +69,8 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
       body: JSON.stringify(next),
     })
       .then((remotePreference) => {
+        if (syncVersion !== onboardingSyncVersion) return;
+
         saveOnboardingPreference(remotePreference);
         set({ preference: remotePreference });
       })
@@ -59,20 +78,33 @@ export const useOnboardingStore = create<OnboardingStore>((set, get) => ({
         console.error('Failed to sync onboarding completion:', error);
       });
   },
-  refreshPreference: () => {
+  hydrateOnboarding: async () => {
+    const syncVersion = ++onboardingSyncVersion;
     const localPreference = getOnboardingPreference();
     set({ preference: localPreference });
-    void apiRequest<OnboardingPreference | null>('/api/onboarding')
-      .then((remotePreference) => {
-        if (remotePreference) {
-          saveOnboardingPreference(remotePreference);
-          set({ preference: remotePreference });
-          return;
-        }
-        set({ preference: localPreference });
-      })
-      .catch((error) => {
-        console.error('Failed to sync onboarding preference:', error);
-      });
+
+    try {
+      const remotePreference = await apiRequest<OnboardingPreference | null>('/api/onboarding');
+
+      if (syncVersion !== onboardingSyncVersion) {
+        return get().preference;
+      }
+
+      if (remotePreference) {
+        saveOnboardingPreference(remotePreference);
+        set({ preference: remotePreference });
+        return remotePreference;
+      }
+
+      clearStoredOnboarding();
+      set({ preference: null });
+      return null;
+    } catch (error) {
+      console.error('Failed to sync onboarding preference:', error);
+      return localPreference;
+    }
+  },
+  refreshPreference: () => {
+    void get().hydrateOnboarding();
   },
 }));

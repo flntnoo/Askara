@@ -63,3 +63,13 @@ export async function removeFavorite(userId: string, cardId: string) {
 
   return getFavorites(userId);
 }
+
+export async function clearFavorites(userId: string) {
+  await prisma.favorite.deleteMany({
+    where: {
+      userId,
+    },
+  });
+
+  return getFavorites(userId);
+}

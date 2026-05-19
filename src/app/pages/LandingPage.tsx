@@ -5,19 +5,22 @@ import { useRouter } from 'next/navigation';
 import svgPaths from '../../imports/Html→Body/svg-qb52pbrj0u';
 import imgImage from '../../imports/Html→Body/66a613613943ccc4bb9a7a0a94d3d47d22fb179b.png';
 import imgImage1 from '../../imports/Html→Body/020d3a901f1034f8d75c81427db8c9fb11ba8923.png';
-import { getOnboardingPreference, getOrCreateAnonymousUser } from '../../utils/storage';
+import { getOrCreateAnonymousUser } from '../../utils/storage';
+import { useOnboardingStore } from '../../stores/onboardingStore';
 import { useEffect } from 'react';
 
 export default function LandingPage() {
   const router = useRouter();
+  const hydrateOnboarding = useOnboardingStore((state) => state.hydrateOnboarding);
 
   useEffect(() => {
     getOrCreateAnonymousUser();
-    const onboarding = getOnboardingPreference();
-    if (onboarding?.completedOnboarding) {
-      router.push('/home');
-    }
-  }, [router]);
+    void hydrateOnboarding().then((onboarding) => {
+      if (onboarding?.completedOnboarding) {
+        router.push('/home');
+      }
+    });
+  }, [hydrateOnboarding, router]);
 
   return (
     <div className="content-stretch flex flex-col isolate items-center pb-[24px] md:pb-[32.4px] relative min-h-screen w-full">
@@ -340,7 +343,7 @@ function Heading2() {
     <div className="drop-shadow-[0px_2px_1px_rgba(0,0,0,0.06),0px_4px_1.5px_rgba(0,0,0,0.07)] relative shrink-0 w-full">
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
         <div className="flex flex-col font-['Hanken_Grotesk',sans-serif] font-bold justify-center leading-[0] relative shrink-0 text-[24px] md:text-[32px] text-white tracking-[-0.24px] md:tracking-[-0.32px] whitespace-nowrap">
-          <p className="leading-[32px] md:leading-[38.4px]">Pasangan Baru</p>
+          <p className="leading-[32px] md:leading-[38.4px]">Merajut Kisah</p>
         </div>
       </div>
     </div>
@@ -352,10 +355,10 @@ function Container12() {
     <div className="content-stretch flex flex-col items-start max-w-full md:max-w-[384px] opacity-90 relative shrink-0 w-full">
       <div className="flex flex-col font-['Hanken_Grotesk',sans-serif] font-normal justify-center leading-[0] relative shrink-0 text-[13px] md:text-[14px] text-white w-full">
         <p className="leading-[20px] md:leading-[21px] mb-0">
-          Kenali pasanganmu lebih dalam dengan pertanyaan-
+          Menyelami perasaan, ekspektasi, dan cara kita
         </p>
         <p className="leading-[20px] md:leading-[21px]">
-          pertanyaan yang tak terduga.
+          saling bertukar rasa dalam hubungan.
         </p>
       </div>
     </div>

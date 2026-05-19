@@ -9,13 +9,13 @@ import { useFavoriteStore } from '../../stores/favoriteStore';
 
 export default function FavoritesPage() {
   const favoriteCardIds = useFavoriteStore((state) => state.favorites);
-  const loadFavorites = useFavoriteStore((state) => state.getFavorites);
+  const hydrateFavorites = useFavoriteStore((state) => state.hydrateFavorites);
   const removeFavorite = useFavoriteStore((state) => state.removeFavorite);
   const [selectedDeck, setSelectedDeck] = useState<string>('all');
 
   useEffect(() => {
-    loadFavorites();
-  }, [loadFavorites]);
+    void hydrateFavorites();
+  }, [hydrateFavorites]);
 
   const favoriteCards = favoriteCardIds
     .map((id) => getCardById(id))

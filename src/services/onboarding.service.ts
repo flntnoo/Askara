@@ -29,3 +29,13 @@ export async function savePreference(userId: string, preference: OnboardingPrefe
     },
   });
 }
+
+export async function resetPreference(userId: string) {
+  await prisma.onboardingPreference.deleteMany({
+    where: {
+      userId,
+    },
+  });
+
+  return null;
+}

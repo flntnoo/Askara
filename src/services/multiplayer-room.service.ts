@@ -8,6 +8,8 @@ type RoomRecord = Awaited<ReturnType<typeof getRoomRecordOrThrow>>;
 
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ROOM_CODE_LENGTH = 6;
+const WAITING_ROOM_TTL_MS = 60 * 60 * 1000;
+const ACTIVE_ROOM_INACTIVITY_TTL_MS = 24 * 60 * 60 * 1000;
 
 function serializeDeck(deck: RoomRecord['deck']): Deck {
   return {
@@ -41,6 +43,18 @@ function generateRoomCode() {
 
 function normalizeRoomCode(code: string) {
   return code.trim().toUpperCase();
+}
+
+function getWaitingRoomExpiresAt(now = new Date()) {
+  return new Date(now.getTime() + WAITING_ROOM_TTL_MS);
+}
+
+function getActiveRoomExpiresAt(now = new Date()) {
+  return new Date(now.getTime() + ACTIVE_ROOM_INACTIVITY_TTL_MS);
+}
+
+function isPast(date: Date | null | undefined, now = new Date()) {
+  return Boolean(date && date <= now);
 }
 
 function shuffle<T>(items: T[]) {
@@ -133,6 +147,9 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     turnIndex: room.turnIndex,
     createdAt: room.createdAt.toISOString(),
     updatedAt: room.updatedAt.toISOString(),
+    startedAt: room.startedAt?.toISOString(),
+    endedAt: room.endedAt?.toISOString(),
+    expiresAt: room.expiresAt?.toISOString(),
     deck: serializeDeck(room.deck),
     players: room.players.map((player) => ({
       id: player.id,
@@ -162,6 +179,47 @@ async function getPlayerForUser(roomId: string, userId: string) {
       isActive: true,
     },
   });
+}
+
+async function expireWaitingRoom(roomId: string, now = new Date()) {
+  await prisma.multiplayerRoom.updateMany({
+    where: {
+      id: roomId,
+      status: 'waiting',
+    },
+    data: {
+      status: 'expired',
+      endedAt: now,
+    },
+  });
+}
+
+async function abandonActiveRoom(roomId: string, now = new Date()) {
+  await prisma.multiplayerRoom.updateMany({
+    where: {
+      id: roomId,
+      status: 'active',
+    },
+    data: {
+      status: 'abandoned',
+      endedAt: now,
+      currentTurnPlayerId: null,
+    },
+  });
+}
+
+async function rejectIfWaitingRoomExpired(room: RoomRecord, now = new Date()) {
+  if (room.status === 'waiting' && isPast(room.expiresAt, now)) {
+    await expireWaitingRoom(room.id, now);
+    throw new ApiError(410, 'Room has expired');
+  }
+}
+
+async function rejectIfActiveRoomInactive(room: RoomRecord, now = new Date()) {
+  if (room.status === 'active' && isPast(room.expiresAt, now)) {
+    await abandonActiveRoom(room.id, now);
+    throw new ApiError(410, 'Room has been abandoned after inactivity');
+  }
 }
 
 export async function createMultiplayerRoom(userId: string, deckId: string, displayName?: string) {
@@ -195,6 +253,7 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
 
   const code = await createUniqueRoomCode();
   const shuffledCards = shuffle(deck.cards);
+  const now = new Date();
 
   await prisma.$transaction(async (tx) => {
     const room = await tx.multiplayerRoom.create({
@@ -203,6 +262,7 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
         deckId,
         hostUserId: userId,
         status: 'waiting',
+        expiresAt: getWaitingRoomExpiresAt(now),
       },
     });
 
@@ -241,9 +301,11 @@ export async function joinMultiplayerRoom(code: string, userId: string, displayN
   if (room.status !== 'waiting') {
     throw new ApiError(
       409,
-      room.status === 'active' ? 'Game already started' : 'Room has already ended',
+      room.status === 'active' ? 'Game already started' : 'Room cannot be joined',
     );
   }
+
+  await rejectIfWaitingRoomExpired(room);
 
   const existingPlayer = await prisma.roomPlayer.findFirst({
     where: {
@@ -302,9 +364,12 @@ export async function startMultiplayerRoom(code: string, userId: string) {
   if (room.status !== 'waiting') {
     throw new ApiError(
       409,
-      room.status === 'active' ? 'Game already started' : 'Room has already ended',
+      room.status === 'active' ? 'Game already started' : 'Room cannot be started',
     );
   }
+
+  const now = new Date();
+  await rejectIfWaitingRoomExpired(room, now);
 
   const activePlayers = room.players.filter((item) => item.isActive);
 
@@ -324,6 +389,8 @@ export async function startMultiplayerRoom(code: string, userId: string) {
     },
     data: {
       status: 'active',
+      startedAt: now,
+      expiresAt: getActiveRoomExpiresAt(now),
       currentTurnPlayerId: firstPlayer.id,
       turnIndex,
     },
@@ -338,6 +405,9 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
   if (room.status !== 'active') {
     throw new ApiError(400, 'Room is not active');
   }
+
+  const now = new Date();
+  await rejectIfActiveRoomInactive(room, now);
 
   const player = await getPlayerForUser(room.id, userId);
 
@@ -368,7 +438,7 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
     },
     data: {
       isRevealed: true,
-      revealedAt: new Date(),
+      revealedAt: now,
       revealedByPlayerId: player.id,
     },
   });
@@ -376,6 +446,15 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
   if (updateResult.count === 0) {
     throw new ApiError(409, 'Card is already revealed');
   }
+
+  await prisma.multiplayerRoom.update({
+    where: {
+      id: room.id,
+    },
+    data: {
+      expiresAt: getActiveRoomExpiresAt(now),
+    },
+  });
 
   return getMultiplayerRoom(room.code, userId);
 }
@@ -391,6 +470,9 @@ export async function moveRoomToNextTurn(code: string, userId: string) {
   if (room.status !== 'active') {
     throw new ApiError(409, 'Room is not active');
   }
+
+  const now = new Date();
+  await rejectIfActiveRoomInactive(room, now);
 
   const activePlayers = room.players.filter((item) => item.isActive);
 
@@ -408,6 +490,7 @@ export async function moveRoomToNextTurn(code: string, userId: string) {
     data: {
       turnIndex: nextIndex,
       currentTurnPlayerId: nextPlayer.id,
+      expiresAt: getActiveRoomExpiresAt(now),
     },
   });
 
@@ -432,6 +515,9 @@ export async function endMultiplayerRoom(code: string, userId: string) {
     },
     data: {
       status: 'completed',
+      endedAt: new Date(),
+      expiresAt: null,
+      currentTurnPlayerId: null,
     },
   });
 

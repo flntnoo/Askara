@@ -5,6 +5,16 @@ import { sortCardsByPhase, toConversationCard } from './card.service';
 
 type TableSessionRecord = Awaited<ReturnType<typeof getOwnedTableSessionOrThrow>>;
 
+const ACTIVE_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+
+function getActiveSessionExpiresAt(now = new Date()) {
+  return new Date(now.getTime() + ACTIVE_SESSION_TTL_MS);
+}
+
+function isPast(date: Date | null | undefined, now = new Date()) {
+  return Boolean(date && date <= now);
+}
+
 function serializeDeck(deck: TableSessionRecord['deck']): Deck {
   return {
     id: deck.id,
@@ -37,6 +47,7 @@ function serializeTableSession(session: TableSessionRecord): TableSession {
     status: session.status as TableSession['status'],
     startedAt: session.startedAt.toISOString(),
     endedAt: session.endedAt?.toISOString(),
+    expiresAt: session.expiresAt?.toISOString(),
     deck: serializeDeck(session.deck),
     cards: session.cardStates.map((state) => ({
       id: state.id,
@@ -109,6 +120,7 @@ export async function createTableSession(userId: string, deckId: string) {
       deckId,
       mode: 'table',
       status: 'active',
+      expiresAt: getActiveSessionExpiresAt(),
       cardStates: {
         create: cards.map((card, position) => ({
           cardId: card.id,
@@ -140,6 +152,7 @@ export async function revealTableCard(
     select: {
       id: true,
       status: true,
+      expiresAt: true,
     },
   });
 
@@ -149,6 +162,23 @@ export async function revealTableCard(
 
   if (session.status !== 'active') {
     throw new ApiError(409, 'Table session is not active');
+  }
+
+  const now = new Date();
+
+  if (isPast(session.expiresAt, now)) {
+    await prisma.cardSession.updateMany({
+      where: {
+        id: session.id,
+        status: 'active',
+      },
+      data: {
+        status: 'expired',
+        endedAt: now,
+        expiresAt: null,
+      },
+    });
+    throw new ApiError(410, 'Table session has expired');
   }
 
   const state = await prisma.sessionCardState.findFirst({
@@ -185,9 +215,19 @@ export async function revealTableCard(
         },
         data: {
           currentCardId: state.cardId,
+          expiresAt: getActiveSessionExpiresAt(now),
         },
       }),
     ]);
+  } else {
+    await prisma.cardSession.update({
+      where: {
+        id: sessionId,
+      },
+      data: {
+        expiresAt: getActiveSessionExpiresAt(now),
+      },
+    });
   }
 
   return getTableSession(sessionId, userId);
@@ -203,6 +243,7 @@ export async function endTableSession(sessionId: string, userId: string) {
     data: {
       status: 'completed',
       endedAt: new Date(),
+      expiresAt: null,
     },
   });
 

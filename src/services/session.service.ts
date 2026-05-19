@@ -16,9 +16,20 @@ type SessionRecord = {
   status: string;
   startedAt: Date;
   endedAt: Date | null;
+  expiresAt: Date | null;
   currentCardId: string | null;
   actions: SessionActionRecord[];
 };
+
+const ACTIVE_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+
+function getActiveSessionExpiresAt(now = new Date()) {
+  return new Date(now.getTime() + ACTIVE_SESSION_TTL_MS);
+}
+
+function isPast(date: Date | null | undefined, now = new Date()) {
+  return Boolean(date && date <= now);
+}
 
 function unique(values: string[]) {
   return Array.from(new Set(values));
@@ -48,6 +59,7 @@ export function serializeSession(session: SessionRecord): CardSession {
     status: session.status as CardSession['status'],
     startedAt: session.startedAt.toISOString(),
     endedAt: session.endedAt?.toISOString(),
+    expiresAt: session.expiresAt?.toISOString(),
     currentCardId: session.currentCardId ?? undefined,
     viewedCardIds: unique(
       session.actions.filter((item) => item.action === 'viewed').map((item) => item.cardId),
@@ -107,6 +119,7 @@ export async function createSession(userId: string, deckId: string) {
       mode: 'solo',
       status: 'active',
       currentCardId: firstCard?.id ?? null,
+      expiresAt: getActiveSessionExpiresAt(),
     },
     include: {
       actions: {
@@ -134,7 +147,7 @@ export async function updateSession(
     endedAt?: string | null;
   },
 ) {
-  await getOwnedSessionOrThrow(sessionId, userId);
+  const existingSession = await getOwnedSessionOrThrow(sessionId, userId);
 
   if (data.currentCardId) {
     const card = await prisma.card.findFirst({
@@ -157,6 +170,12 @@ export async function updateSession(
         : data.status && data.status !== 'active'
           ? new Date()
           : undefined;
+  const expiresAt =
+    data.status && data.status !== 'active'
+      ? null
+      : data.status === 'active' || (existingSession.status === 'active' && data.currentCardId !== undefined)
+        ? getActiveSessionExpiresAt()
+        : undefined;
 
   const session = await prisma.cardSession.update({
     where: {
@@ -166,6 +185,7 @@ export async function updateSession(
       ...(data.status ? { status: data.status } : {}),
       ...(data.currentCardId !== undefined ? { currentCardId: data.currentCardId } : {}),
       ...(endedAt !== undefined ? { endedAt } : {}),
+      ...(expiresAt !== undefined ? { expiresAt } : {}),
     },
     include: {
       actions: {
@@ -191,6 +211,23 @@ export async function logSessionAction(
 
   if (session.status !== 'active') {
     throw new ApiError(409, 'Session is not active');
+  }
+
+  const now = new Date();
+
+  if (isPast(session.expiresAt, now)) {
+    await prisma.cardSession.updateMany({
+      where: {
+        id: session.id,
+        status: 'active',
+      },
+      data: {
+        status: 'expired',
+        endedAt: now,
+        expiresAt: null,
+      },
+    });
+    throw new ApiError(410, 'Session has expired');
   }
 
   const card = await prisma.card.findFirst({
@@ -254,6 +291,7 @@ export async function logSessionAction(
       },
       data: {
         currentCardId: nextCard?.id ?? null,
+        expiresAt: getActiveSessionExpiresAt(now),
       },
       include: {
         actions: {
@@ -267,7 +305,23 @@ export async function logSessionAction(
     return serializeSession(nextSession);
   }
 
-  return serialized;
+  const refreshedSession = await prisma.cardSession.update({
+    where: {
+      id: sessionId,
+    },
+    data: {
+      expiresAt: getActiveSessionExpiresAt(now),
+    },
+    include: {
+      actions: {
+        orderBy: {
+          shownAt: 'asc',
+        },
+      },
+    },
+  });
+
+  return serializeSession(refreshedSession);
 }
 
 export async function getActiveSession(userId: string) {
@@ -288,6 +342,21 @@ export async function getActiveSession(userId: string) {
       },
     },
   });
+
+  if (session && isPast(session.expiresAt)) {
+    await prisma.cardSession.updateMany({
+      where: {
+        id: session.id,
+        status: 'active',
+      },
+      data: {
+        status: 'expired',
+        endedAt: new Date(),
+        expiresAt: null,
+      },
+    });
+    return null;
+  }
 
   return session ? serializeSession(session) : null;
 }

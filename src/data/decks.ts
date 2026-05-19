@@ -1,13 +1,25 @@
 import { Deck, DeckCategory } from '../types';
 
+export const DECK_CATEGORY_LABELS: Record<DeckCategory, string> = {
+  'ice-breaker': 'Ice Breaker',
+  pdkt: 'PDKT',
+  pacaran: 'Pacaran',
+  ldr: 'LDR',
+  'pra-nikah': 'Pra-Nikah',
+  'suami-istri': 'Suami-Istri',
+  konflik: 'Konflik & Maaf',
+  apresiasi: 'Apresiasi',
+  'masa-depan': 'Masa Depan',
+};
+
 export const DECKS: Deck[] = [
   {
     id: 'deck-ice-breaker',
     slug: 'ice-breaker',
-    name: 'Ice Breaker',
-    title: 'Ice Breaker',
-    description: 'Ringan, santai, pembuka obrolan untuk mengenal satu sama lain.',
-    shortDescription: 'Ringan, santai, pembuka obrolan',
+    name: 'Titik Temu',
+    title: 'Titik Temu',
+    description: 'Sapaan awal yang hangat untuk mulai membuka pintu cerita satu sama lain.',
+    shortDescription: 'Sapaan awal yang hangat untuk mulai membuka pintu cerita satu sama lain.',
     category: 'ice-breaker',
     cardCount: 30,
     estimatedMinutes: 15,
@@ -24,10 +36,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-pdkt',
     slug: 'pdkt',
-    name: 'PDKT',
-    title: 'PDKT',
-    description: 'Mengenal nilai, kebiasaan, dan ketertarikan saat mulai dekat.',
-    shortDescription: 'Mengenal nilai, kebiasaan, ketertarikan',
+    name: 'Percikan Awal',
+    title: 'Percikan Awal',
+    description: 'Menelusuri rasa, kebiasaan, dan ketertarikan yang mulai tumbuh perlahan.',
+    shortDescription: 'Menelusuri rasa, kebiasaan, dan ketertarikan yang mulai tumbuh perlahan.',
     category: 'pdkt',
     cardCount: 30,
     estimatedMinutes: 20,
@@ -44,10 +56,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-pacaran',
     slug: 'pacaran',
-    name: 'Pacaran',
-    title: 'Pacaran',
-    description: 'Membahas perasaan, ekspektasi, dan komunikasi dalam hubungan.',
-    shortDescription: 'Perasaan, ekspektasi, komunikasi',
+    name: 'Merajut Kisah',
+    title: 'Merajut Kisah',
+    description: 'Menyelami perasaan, ekspektasi, dan cara kita saling bertukar rasa dalam hubungan.',
+    shortDescription: 'Menyelami perasaan, ekspektasi, dan cara kita saling bertukar rasa dalam hubungan.',
     category: 'pacaran',
     cardCount: 30,
     estimatedMinutes: 20,
@@ -63,10 +75,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-ldr',
     slug: 'ldr',
-    name: 'LDR',
-    title: 'LDR',
-    description: 'Membahas kepercayaan, jarak, rutinitas, dan komitmen dalam hubungan jarak jauh.',
-    shortDescription: 'Kepercayaan, jarak, rutinitas, komitmen',
+    name: 'Jarak & Rindu',
+    title: 'Jarak & Rindu',
+    description: 'Menjaga percaya, merawat komitmen, dan menepis sekat ruang yang memisahkan.',
+    shortDescription: 'Menjaga percaya, merawat komitmen, dan menepis sekat ruang yang memisahkan.',
     category: 'ldr',
     cardCount: 30,
     estimatedMinutes: 20,
@@ -82,10 +94,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-pra-nikah',
     slug: 'pra-nikah',
-    name: 'Pra-Nikah',
-    title: 'Pra-Nikah',
-    description: 'Bahas finansial, keluarga, rencana hidup, dan konflik sebelum menikah.',
-    shortDescription: 'Finansial, keluarga, rencana hidup, konflik',
+    name: 'Gerbang Komitmen',
+    title: 'Gerbang Komitmen',
+    description: 'Menyelaraskan visi, kesiapan finansial, dan meredam kekhawatiran sebelum melangkah lebih jauh.',
+    shortDescription: 'Menyelaraskan visi, kesiapan finansial, dan meredam kekhawatiran sebelum melangkah lebih jauh.',
     category: 'pra-nikah',
     cardCount: 30,
     estimatedMinutes: 30,
@@ -101,10 +113,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-suami-istri',
     slug: 'suami-istri',
-    name: 'Suami-Istri',
-    title: 'Suami-Istri',
-    description: 'Membahas keintiman, kerja sama, dan rutinitas rumah tangga.',
-    shortDescription: 'Keintiman, kerja sama, rumah tangga',
+    name: 'Teman Hidup',
+    title: 'Teman Hidup',
+    description: 'Merawat keintiman, menyatukan ritme harian, dan merayakan peran baru di bawah satu atap.',
+    shortDescription: 'Merawat keintiman, menyatukan ritme harian, dan merayakan peran baru di bawah satu atap.',
     category: 'suami-istri',
     cardCount: 30,
     estimatedMinutes: 25,
@@ -120,10 +132,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-konflik',
     slug: 'konflik',
-    name: 'Konflik & Maaf',
-    title: 'Konflik & Maaf',
-    description: 'Membahas cara bertengkar, luka, dan kebutuhan emosional dengan aman.',
-    shortDescription: 'Cara bertengkar, luka, kebutuhan emosional',
+    name: 'Badai & Reda',
+    title: 'Badai & Reda',
+    description: 'Menemukan jalan pulang saat ego bertubrukan dan luka butuh dipeluk dengan aman.',
+    shortDescription: 'Menemukan jalan pulang saat ego bertubrukan dan luka butuh dipeluk dengan aman.',
     category: 'konflik',
     cardCount: 30,
     estimatedMinutes: 30,
@@ -139,10 +151,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-apresiasi',
     slug: 'apresiasi',
-    name: 'Apresiasi',
-    title: 'Apresiasi',
-    description: 'Mengungkap rasa syukur, validasi, dan hal kecil yang dihargai.',
-    shortDescription: 'Rasa syukur, validasi, hal kecil dihargai',
+    name: 'Merayakan Kita',
+    title: 'Merayakan Kita',
+    description: 'Mengungkapkan rasa syukur, memvalidasi lelah, dan menghargai ketulusan yang ada.',
+    shortDescription: 'Mengungkapkan rasa syukur, memvalidasi lelah, dan menghargai ketulusan yang ada.',
     category: 'apresiasi',
     cardCount: 30,
     estimatedMinutes: 15,
@@ -159,10 +171,10 @@ export const DECKS: Deck[] = [
   {
     id: 'deck-masa-depan',
     slug: 'masa-depan',
-    name: 'Masa Depan',
-    title: 'Masa Depan',
-    description: 'Membahas karier, anak, tempat tinggal, dan prioritas hidup bersama.',
-    shortDescription: 'Karier, anak, tempat tinggal, prioritas hidup',
+    name: 'Menatap Esok',
+    title: 'Menatap Esok',
+    description: 'Merajut mimpi, membicarakan arah, tempat tinggal, dan hari-hari tua yang ingin kita bagi.',
+    shortDescription: 'Merajut mimpi, membicarakan arah, tempat tinggal, dan hari-hari tua yang ingin kita bagi.',
     category: 'masa-depan',
     cardCount: 30,
     estimatedMinutes: 30,
@@ -191,4 +203,8 @@ export const getDeckBySlug = (slug: string): Deck | undefined => {
 
 export const getDecksByCategory = (category: DeckCategory): Deck[] => {
   return getAllDecks().filter((deck) => deck.category === category);
+};
+
+export const getDeckCategoryLabel = (category: DeckCategory): string => {
+  return DECK_CATEGORY_LABELS[category];
 };

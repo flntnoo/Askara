@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { getAllDecks } from '../../data/decks';
+import { getAllDecks, getDeckCategoryLabel } from '../../data/decks';
 import { DeckCategory } from '../../types';
 
 const FILTERS: Array<{ label: string; category: DeckCategory | 'all' }> = [
@@ -73,9 +73,12 @@ export default function DecksPage() {
               </div>
 
               {/* Deck Info */}
-              <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-2">
+              <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-1">
                 {deck.name}
               </h3>
+              <div className="font-['Hanken_Grotesk',sans-serif] font-bold text-xs uppercase tracking-[0.08em] text-[#a93718] mb-2">
+                {getDeckCategoryLabel(deck.category)}
+              </div>
               <p className="font-['Hanken_Grotesk',sans-serif] font-normal text-sm text-[#58413c] mb-4 line-clamp-2">
                 {deck.description}
               </p>
@@ -83,7 +86,7 @@ export default function DecksPage() {
               {/* Deck Meta */}
               <div className="flex items-center gap-2 text-xs text-[#58413c] font-['Hanken_Grotesk',sans-serif] font-medium">
                 <span>{deck.cardCount} kartu</span>
-                <span>•</span>
+                <span>&bull;</span>
                 <span>{deck.estimatedDuration}</span>
               </div>
             </Link>

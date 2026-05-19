@@ -110,6 +110,8 @@ model CardSession {
   currentCardId String?
   startedAt     DateTime  @default(now())
   endedAt       DateTime?
+  expiresAt     DateTime?
+  updatedAt     DateTime  @updatedAt
 
   user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   deck       Deck               @relation(fields: [deckId], references: [id])
@@ -120,6 +122,8 @@ model CardSession {
   @@index([userId, mode, status])
   @@index([deckId])
   @@index([startedAt])
+  @@index([status, expiresAt])
+  @@index([status, updatedAt])
   @@map("Session")
 }
 
@@ -170,6 +174,9 @@ model MultiplayerRoom {
   turnIndex           Int      @default(0)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  startedAt           DateTime?
+  endedAt             DateTime?
+  expiresAt           DateTime?
 
   deck              Deck         @relation(fields: [deckId], references: [id])
   hostUser          User?        @relation("HostedMultiplayerRooms", fields: [hostUserId], references: [id], onDelete: SetNull)
@@ -181,6 +188,8 @@ model MultiplayerRoom {
   @@index([hostUserId])
   @@index([status])
   @@index([currentTurnPlayerId])
+  @@index([status, expiresAt])
+  @@index([status, updatedAt])
 }
 
 model RoomPlayer {

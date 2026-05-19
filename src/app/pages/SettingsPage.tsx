@@ -2,18 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { Trash2, Info, Heart, HelpCircle, RotateCcw, UserRound, LogIn, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Trash2, Info, HelpCircle, RotateCcw, UserRound, LogIn, LogOut } from 'lucide-react';
 import {
-  getActiveSession,
-  getFavorites,
-  getOnboardingPreference,
   getOrCreateAnonymousUser,
-  getSessionHistory,
   resetAllData,
-  resetFavorites,
-  resetOnboarding,
 } from '../../utils/storage';
-import { AnonymousUser, OnboardingPreference } from '../../types';
+import { AnonymousUser } from '../../types';
 import { useFavoriteStore } from '../../stores/favoriteStore';
 import { useOnboardingStore } from '../../stores/onboardingStore';
 import { apiRequest } from '../../lib/api-client';
@@ -21,23 +16,18 @@ import { apiRequest } from '../../lib/api-client';
 type DialogAction = 'onboarding' | 'favorites' | 'all' | null;
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [dialogAction, setDialogAction] = useState<DialogAction>(null);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
   const [anonymousUser, setAnonymousUser] = useState<AnonymousUser | null>(null);
-  const [onboarding, setOnboarding] = useState<OnboardingPreference | null>(null);
-  const [totalSessions, setTotalSessions] = useState(0);
-  const [totalFavorites, setTotalFavorites] = useState(0);
   const [didRequestLink, setDidRequestLink] = useState(false);
-  const refreshFavoriteStore = useFavoriteStore((state) => state.refreshFavorites);
-  const refreshOnboardingStore = useOnboardingStore((state) => state.refreshPreference);
+  const clearFavoriteStore = useFavoriteStore((state) => state.clearFavorites);
+  const resetOnboardingStore = useOnboardingStore((state) => state.resetOnboarding);
 
   const refreshStats = (createUser = true) => {
     setAnonymousUser(createUser ? getOrCreateAnonymousUser() : null);
-    setOnboarding(getOnboardingPreference());
-    setTotalSessions(getSessionHistory().length + (getActiveSession() ? 1 : 0));
-    setTotalFavorites(getFavorites().length);
-    refreshFavoriteStore();
-    refreshOnboardingStore();
   };
 
   useEffect(() => {
@@ -67,19 +57,38 @@ export default function SettingsPage() {
     void signIn('google');
   };
 
-  const handleConfirm = () => {
-    if (dialogAction === 'onboarding') {
-      resetOnboarding();
-    }
-    if (dialogAction === 'favorites') {
-      resetFavorites();
-    }
-    if (dialogAction === 'all') {
-      resetAllData();
-    }
+  const handleConfirm = async () => {
+    if (!dialogAction || isResetting) return;
 
-    setDialogAction(null);
-    refreshStats(dialogAction !== 'all');
+    const action = dialogAction;
+    setIsResetting(true);
+    setResetError(null);
+
+    try {
+      if (action === 'onboarding') {
+        await resetOnboardingStore();
+      }
+      if (action === 'favorites') {
+        await clearFavoriteStore();
+      }
+      if (action === 'all') {
+        await Promise.all([clearFavoriteStore(), resetOnboardingStore()]);
+        resetAllData();
+      }
+
+      setDialogAction(null);
+      refreshStats(action !== 'all');
+      router.refresh();
+
+      if (action === 'onboarding' || action === 'all') {
+        router.push('/onboarding');
+      }
+    } catch (error) {
+      console.error('Failed to reset data:', error);
+      setResetError('Reset gagal. Coba lagi setelah koneksi atau server tersedia.');
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   return (
@@ -102,20 +111,8 @@ export default function SettingsPage() {
                 Data Kamu
               </h3>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-4">
-                Semua data tersimpan di browser kamu dalam Guest Mode. Askara tidak membutuhkan login untuk MVP ini.
+                Kelola data aktivitas, favorit, dan preferensi yang tersimpan di Askara.
               </p>
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="bg-[#f0edec] px-3 py-1 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#1c1b1b]">
-                  {totalSessions} sesi
-                </div>
-                <div className="bg-[#f0edec] px-3 py-1 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#1c1b1b] flex items-center gap-2">
-                  <Heart className="w-4 h-4" fill="#a93718" />
-                  {totalFavorites} favorit
-                </div>
-                <div className="bg-[#f0edec] px-3 py-1 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#1c1b1b]">
-                  Onboarding {onboarding?.completedOnboarding ? 'selesai' : 'belum selesai'}
-                </div>
-              </div>
             </div>
           </div>
         </section>
@@ -178,7 +175,7 @@ export default function SettingsPage() {
                 Tentang Askara
               </h3>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-2">
-                Privacy: data percakapan tidak disimpan. Hanya preferensi, sesi, dan favorit lokal yang tersimpan.
+                Askara membantu kamu memulai percakapan lewat kartu pertanyaan interaktif. Data seperti favorit, preferensi, sesi permainan, dan akun digunakan untuk menjaga pengalaman bermain kamu.
               </p>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-2">
                 Kontak: hello@askara.local
@@ -198,7 +195,7 @@ export default function SettingsPage() {
                 Reset Data
               </h3>
               <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c] mb-4">
-                Pilih reset yang kamu butuhkan. Reset onboarding tidak menghapus favorit, dan reset favorit tidak menghapus onboarding.
+                Reset data tertentu sesuai kebutuhan kamu.
               </p>
               <div className="flex flex-col md:flex-row gap-3">
                 <ResetButton label="Reset Onboarding" onClick={() => setDialogAction('onboarding')} />
@@ -219,21 +216,28 @@ export default function SettingsPage() {
             <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[#58413c] mb-6">
               Tindakan ini akan menjalankan reset yang dipilih dan tidak bisa dibatalkan.
             </p>
+            {resetError && (
+              <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#d4183d] mb-4">
+                {resetError}
+              </p>
+            )}
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => setDialogAction(null)}
+                disabled={isResetting}
                 aria-label="close"
-                className="flex-1 min-h-11 bg-[#f0edec] border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px] transition-all"
+                className="flex-1 min-h-11 bg-[#f0edec] border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="flex-1 min-h-11 bg-[#d4183d] border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-white shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
+                disabled={isResetting}
+                className="flex-1 min-h-11 bg-[#d4183d] border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-white shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_#1c1b1b]"
               >
-                Reset
+                {isResetting ? 'Mereset...' : 'Reset'}
               </button>
             </div>
           </div>

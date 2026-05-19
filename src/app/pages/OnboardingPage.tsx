@@ -10,6 +10,8 @@ import { useOnboardingStore } from '../../stores/onboardingStore';
 export default function OnboardingPage() {
   const router = useRouter();
   const savePreference = useOnboardingStore((state) => state.savePreference);
+  const hydrateOnboarding = useOnboardingStore((state) => state.hydrateOnboarding);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<Partial<OnboardingPreference>>({});
 
@@ -19,8 +21,28 @@ export default function OnboardingPage() {
   const displayStep = needsRelationshipStage ? step : step > 1 ? step - 1 : step;
 
   useEffect(() => {
-    getOrCreateAnonymousUser();
-  }, []);
+    let isCurrent = true;
+
+    async function checkOnboardingStatus() {
+      getOrCreateAnonymousUser();
+      const preference = await hydrateOnboarding();
+
+      if (!isCurrent) return;
+
+      if (preference?.completedOnboarding) {
+        router.replace('/home');
+        return;
+      }
+
+      setIsCheckingOnboarding(false);
+    }
+
+    void checkOnboardingStatus();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [hydrateOnboarding, router]);
 
   const saveAndGoHome = (completedOnboarding: boolean) => {
     savePreference({
@@ -58,6 +80,10 @@ export default function OnboardingPage() {
   const handleSkip = () => {
     saveAndGoHome(true);
   };
+
+  if (isCheckingOnboarding) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen w-full items-center justify-center p-4 md:p-8">

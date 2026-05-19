@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { ArrowLeft, Loader2, LogIn, Plus, UsersRound } from 'lucide-react';
-import { getDeckBySlug } from '../../data/decks';
+import { getDeckBySlug, getDeckCategoryLabel } from '../../data/decks';
 import { apiRequest } from '../../lib/api-client';
 import type { MultiplayerRoom } from '../../types';
 import { saveJoinedRoomPlayer } from '../../utils/storage';
@@ -147,6 +147,9 @@ export default function MultiplayerSetupPage() {
             <h1 className="mb-3 font-['Hanken_Grotesk',sans-serif] text-[36px] font-extrabold leading-tight md:text-[52px]">
               {deck.name}
             </h1>
+            <div className="mb-3 inline-flex rounded-lg border-2 border-[#1c1b1b] bg-white px-3 py-1 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#a93718]">
+              {getDeckCategoryLabel(deck.category)}
+            </div>
             <p className="max-w-2xl font-['Hanken_Grotesk',sans-serif] text-lg font-medium text-[#58413c]">
               {deck.description}
             </p>
