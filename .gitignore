@@ -5,4 +5,7 @@ dist/
 build/
 .next/
 .vite/
-.DS_Store   
+.DS_Store 
+*.log
+next-dev.log
+next-dev.err.log  
