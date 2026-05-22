@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { getDeckListingCoverSrc } from '../../data/deckListingCovers';
 import { getAllDecks, getDeckCategoryLabel } from '../../data/decks';
 import { DeckCategory } from '../../types';
 
@@ -58,39 +60,46 @@ export default function DecksPage() {
 
         {/* Deck Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {visibleDecks.map((deck) => (
-            <Link
-              key={deck.id}
-              href={`/decks/${deck.slug}`}
-              className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
-            >
-              {/* Deck Color Preview */}
-              <div
-                className="w-full h-40 rounded-lg mb-4 flex items-center justify-center border-2 border-[#1c1b1b] text-5xl"
-                style={{ backgroundColor: deck.color }}
+          {visibleDecks.map((deck) => {
+            const coverSrc = getDeckListingCoverSrc(deck.slug);
+
+            return (
+              <Link
+                key={deck.id}
+                href={`/decks/${deck.slug}`}
+                className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
               >
-                {deck.icon}
-              </div>
+                {/* Deck Cover Preview */}
+                <div className="relative w-full h-40 rounded-lg mb-4 overflow-hidden border-2 border-[#1c1b1b]">
+                  <Image
+                    src={coverSrc}
+                    alt={`${deck.name} cover`}
+                    fill
+                    sizes="(min-width: 1024px) 320px, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
 
-              {/* Deck Info */}
-              <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-1">
-                {deck.name}
-              </h3>
-              <div className="font-['Hanken_Grotesk',sans-serif] font-bold text-xs uppercase tracking-[0.08em] text-[#a93718] mb-2">
-                {getDeckCategoryLabel(deck.category)}
-              </div>
-              <p className="font-['Hanken_Grotesk',sans-serif] font-normal text-sm text-[#58413c] mb-4 line-clamp-2">
-                {deck.description}
-              </p>
+                {/* Deck Info */}
+                <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-1">
+                  {deck.name}
+                </h3>
+                <div className="font-['Hanken_Grotesk',sans-serif] font-bold text-xs uppercase tracking-[0.08em] text-[#a93718] mb-2">
+                  {getDeckCategoryLabel(deck.category)}
+                </div>
+                <p className="font-['Hanken_Grotesk',sans-serif] font-normal text-sm text-[#58413c] mb-4 line-clamp-2">
+                  {deck.description}
+                </p>
 
-              {/* Deck Meta */}
-              <div className="flex items-center gap-2 text-xs text-[#58413c] font-['Hanken_Grotesk',sans-serif] font-medium">
-                <span>{deck.cardCount} kartu</span>
-                <span>&bull;</span>
-                <span>{deck.estimatedDuration}</span>
-              </div>
-            </Link>
-          ))}
+                {/* Deck Meta */}
+                <div className="flex items-center gap-2 text-xs text-[#58413c] font-['Hanken_Grotesk',sans-serif] font-medium">
+                  <span>{deck.cardCount} kartu</span>
+                  <span>&bull;</span>
+                  <span>{deck.estimatedDuration}</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

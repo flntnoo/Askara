@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Copy,
   Loader2,
-  RotateCcw,
   Trophy,
   UsersRound,
   X,
@@ -28,15 +27,16 @@ export default function RoomBoardPage() {
   const [selectedCard, setSelectedCard] = useState<RoomCardState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRevealing, setIsRevealing] = useState<string | null>(null);
-  const [isAdvancingTurn, setIsAdvancingTurn] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadRoom = useCallback(async () => {
+  const loadRoom = useCallback(async (showLoading = false) => {
     if (!code) return;
 
-    setIsLoading(true);
-    setError(null);
+    if (showLoading) {
+      setIsLoading(true);
+      setError(null);
+    }
 
     try {
       const nextRoom = await apiRequest<MultiplayerRoom>(`/api/rooms/${code.toUpperCase()}`);
@@ -56,17 +56,27 @@ export default function RoomBoardPage() {
       }
 
       setRoom(nextRoom);
-      setSelectedCard((current) => current ?? nextRoom.latestRevealedCard ?? null);
+      setSelectedCard(nextRoom.latestRevealedCard ?? null);
     } catch (loadError) {
       console.error('Failed to load multiplayer room:', loadError);
       setError('Room tidak ditemukan atau sudah tidak bisa dibuka.');
     } finally {
-      setIsLoading(false);
+      if (showLoading) {
+        setIsLoading(false);
+      }
     }
   }, [code, router]);
 
   useEffect(() => {
-    void loadRoom();
+    void loadRoom(true);
+  }, [loadRoom]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void loadRoom();
+    }, 2000);
+
+    return () => window.clearInterval(timer);
   }, [loadRoom]);
 
   const unrevealedCards = useMemo(
@@ -77,11 +87,21 @@ export default function RoomBoardPage() {
   const totalCount = room?.cards.length ?? 0;
   const remainingCount = unrevealedCards.length;
   const progressPercent = totalCount > 0 ? (revealedCount / totalCount) * 100 : 0;
-  const currentTurnPlayer = room?.players.find((player) => player.id === room.currentTurnPlayerId);
+  const isCurrentPlayerTurn = Boolean(
+    room?.currentPlayerId && room.currentPlayerId === room.currentTurnPlayerId,
+  );
   const isComplete = totalCount > 0 && remainingCount === 0;
 
   const revealCard = async (card: RoomCardState) => {
-    if (!room || card.isRevealed || isRevealing || room.status !== 'active') return;
+    if (
+      !room ||
+      card.isRevealed ||
+      isRevealing ||
+      room.status !== 'active' ||
+      !isCurrentPlayerTurn
+    ) {
+      return;
+    }
 
     setIsRevealing(card.id);
     setError(null);
@@ -100,25 +120,6 @@ export default function RoomBoardPage() {
       setError('Kartu belum bisa dibuka. Pastikan kamu sudah join dan giliranmu aktif.');
     } finally {
       setIsRevealing(null);
-    }
-  };
-
-  const nextTurn = async () => {
-    if (!room || isAdvancingTurn || room.status !== 'active') return;
-
-    setIsAdvancingTurn(true);
-    setError(null);
-
-    try {
-      const nextRoom = await apiRequest<MultiplayerRoom>(`/api/rooms/${room.code}/next-turn`, {
-        method: 'POST',
-      });
-      setRoom(nextRoom);
-    } catch (turnError) {
-      console.error('Failed to move to next turn:', turnError);
-      setError('Giliran belum bisa dipindahkan. Pastikan kamu sudah join room ini.');
-    } finally {
-      setIsAdvancingTurn(false);
     }
   };
 
@@ -267,20 +268,6 @@ export default function RoomBoardPage() {
               <UsersRound className="h-4 w-4" />
               {room.players.length} players
             </div>
-            {currentTurnPlayer && (
-              <div className="inline-flex items-center gap-2 rounded-lg border-2 border-[#1c1b1b] bg-[#ffe087] px-3 py-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500]">
-                <RotateCcw className="h-4 w-4" />
-                {currentTurnPlayer.displayName}
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => void nextTurn()}
-              disabled={isAdvancingTurn || room.status !== 'active'}
-              className="min-h-10 rounded-lg border-2 border-[#1c1b1b] bg-white px-4 py-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] hover:shadow-[3px_3px_0px_#1c1b1b] disabled:opacity-50"
-            >
-              {isAdvancingTurn ? 'Loading...' : 'Next Turn'}
-            </button>
           </div>
 
           {room.status === 'active' ? (
@@ -295,7 +282,7 @@ export default function RoomBoardPage() {
                     key={card.id}
                     type="button"
                     onClick={() => void revealCard(card)}
-                    disabled={showBusy || room.status !== 'active'}
+                    disabled={showBusy || room.status !== 'active' || !isCurrentPlayerTurn}
                     aria-label={`Buka kartu ${card.position + 1}`}
                     className="group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] bg-[#ffe087] text-left transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b1b] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] disabled:opacity-60"
                   >

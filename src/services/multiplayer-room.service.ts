@@ -69,6 +69,33 @@ function shuffle<T>(items: T[]) {
   return next;
 }
 
+function getActiveTurn(
+  activePlayers: RoomRecord['players'],
+  currentTurnPlayerId: string | null,
+  turnIndex: number,
+) {
+  if (activePlayers.length === 0) {
+    return null;
+  }
+
+  const currentIndex = activePlayers.findIndex((player) => player.id === currentTurnPlayerId);
+
+  if (currentIndex >= 0) {
+    return {
+      index: currentIndex,
+      player: activePlayers[currentIndex],
+    };
+  }
+
+  const fallbackIndex = ((turnIndex % activePlayers.length) + activePlayers.length) %
+    activePlayers.length;
+
+  return {
+    index: fallbackIndex,
+    player: activePlayers[fallbackIndex],
+  };
+}
+
 async function createUniqueRoomCode() {
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const code = generateRoomCode();
@@ -140,6 +167,14 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     [...cards]
       .filter((state) => state.isRevealed && state.revealedAt)
       .sort((a, b) => (b.revealedAt ?? '').localeCompare(a.revealedAt ?? ''))[0] ?? null;
+  const activeTurn =
+    room.status === 'active'
+      ? getActiveTurn(
+          room.players.filter((player) => player.isActive),
+          room.currentTurnPlayerId,
+          room.turnIndex,
+        )
+      : null;
 
   return {
     id: room.id,
@@ -147,7 +182,7 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     deckId: room.deckId,
     hostUserId: room.hostUserId ?? undefined,
     status: room.status as MultiplayerRoom['status'],
-    currentTurnPlayerId: room.currentTurnPlayerId ?? undefined,
+    currentTurnPlayerId: activeTurn?.player.id,
     turnIndex: room.turnIndex,
     createdAt: room.createdAt.toISOString(),
     updatedAt: room.updatedAt.toISOString(),
@@ -420,12 +455,13 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
   }
 
   const activePlayers = room.players.filter((item) => item.isActive);
+  const activeTurn = getActiveTurn(activePlayers, room.currentTurnPlayerId, room.turnIndex);
 
-  if (
-    activePlayers.length > 1 &&
-    room.currentTurnPlayerId &&
-    room.currentTurnPlayerId !== player.id
-  ) {
+  if (!activeTurn) {
+    throw new ApiError(409, 'Room has no active players');
+  }
+
+  if (activeTurn.player.id !== player.id) {
     throw new ApiError(409, 'It is not your turn');
   }
 
@@ -435,67 +471,43 @@ export async function revealRoomCard(code: string, userId: string, roomCardId: s
     throw new ApiError(404, 'Card not found for this room');
   }
 
-  const updateResult = await prisma.roomCard.updateMany({
-    where: {
-      id: roomCard.id,
-      isRevealed: false,
-    },
-    data: {
-      isRevealed: true,
-      revealedAt: now,
-      revealedByPlayerId: player.id,
-    },
-  });
+  const nextTurnIndex = (activeTurn.index + 1) % activePlayers.length;
+  const nextTurnPlayer = activePlayers[nextTurnIndex];
 
-  if (updateResult.count === 0) {
-    throw new ApiError(409, 'Card is already revealed');
-  }
+  await prisma.$transaction(async (tx) => {
+    const cardUpdate = await tx.roomCard.updateMany({
+      where: {
+        id: roomCard.id,
+        roomId: room.id,
+        isRevealed: false,
+      },
+      data: {
+        isRevealed: true,
+        revealedAt: now,
+        revealedByPlayerId: player.id,
+      },
+    });
 
-  await prisma.multiplayerRoom.update({
-    where: {
-      id: room.id,
-    },
-    data: {
-      expiresAt: getActiveRoomExpiresAt(now),
-    },
-  });
+    if (cardUpdate.count === 0) {
+      throw new ApiError(409, 'Card is already revealed');
+    }
 
-  return getMultiplayerRoom(room.code, userId);
-}
+    const roomUpdate = await tx.multiplayerRoom.updateMany({
+      where: {
+        id: room.id,
+        status: 'active',
+        currentTurnPlayerId: room.currentTurnPlayerId,
+      },
+      data: {
+        turnIndex: nextTurnIndex,
+        currentTurnPlayerId: nextTurnPlayer.id,
+        expiresAt: getActiveRoomExpiresAt(now),
+      },
+    });
 
-export async function moveRoomToNextTurn(code: string, userId: string) {
-  const room = await getRoomRecordOrThrow(code);
-  const player = await getPlayerForUser(room.id, userId);
-
-  if (!player) {
-    throw new ApiError(403, 'Join the room before changing turns');
-  }
-
-  if (room.status !== 'active') {
-    throw new ApiError(409, 'Room is not active');
-  }
-
-  const now = new Date();
-  await rejectIfActiveRoomInactive(room, now);
-
-  const activePlayers = room.players.filter((item) => item.isActive);
-
-  if (activePlayers.length === 0) {
-    throw new ApiError(409, 'Room has no active players');
-  }
-
-  const nextIndex = (room.turnIndex + 1) % activePlayers.length;
-  const nextPlayer = activePlayers[nextIndex];
-
-  await prisma.multiplayerRoom.update({
-    where: {
-      id: room.id,
-    },
-    data: {
-      turnIndex: nextIndex,
-      currentTurnPlayerId: nextPlayer.id,
-      expiresAt: getActiveRoomExpiresAt(now),
-    },
+    if (roomUpdate.count === 0) {
+      throw new ApiError(409, 'Turn already changed. Refresh and try again.');
+    }
   });
 
   return getMultiplayerRoom(room.code, userId);
