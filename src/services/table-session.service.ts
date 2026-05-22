@@ -3,7 +3,7 @@ import { ApiError } from '../lib/api-response';
 import { prisma } from '../lib/prisma';
 import {
   getBoardCardBackImageSrc,
-  TITIK_TEMU_DECK_ID,
+  shouldRandomizeBoardQuestions,
 } from '../data/cardBackImages';
 import type { Deck, TableSession } from '../types';
 import { sortCardsByPhase, toConversationCard } from './card.service';
@@ -128,7 +128,7 @@ export async function createTableSession(userId: string, deckId: string) {
   }
 
   const sortedCards = sortCardsByPhase(deck.cards);
-  const cards = deck.id === TITIK_TEMU_DECK_ID ? shuffle(sortedCards) : sortedCards;
+  const cards = shouldRandomizeBoardQuestions(deck.id) ? shuffle(sortedCards) : sortedCards;
 
   if (cards.length === 0) {
     throw new ApiError(409, 'Deck has no playable cards');

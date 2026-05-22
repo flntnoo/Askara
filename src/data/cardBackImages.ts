@@ -1,16 +1,48 @@
 export const TITIK_TEMU_DECK_ID = 'deck-ice-breaker';
+export const PERCIKAN_AWAL_DECK_ID = 'deck-pdkt';
+export const MERAJUT_KISAH_DECK_ID = 'deck-pacaran';
+export const JARAK_DAN_RINDU_DECK_ID = 'deck-ldr';
 
-const TITIK_TEMU_CARD_BACK_COUNT = 30;
+type BoardCardBackConfig = {
+  assetDirectory: string;
+  cardBackCount: number;
+  randomizeQuestions: boolean;
+};
+
+const BOARD_CARD_BACK_CONFIGS: Record<string, BoardCardBackConfig> = {
+  [TITIK_TEMU_DECK_ID]: {
+    assetDirectory: '/assets/decks/titik-temu/cards',
+    cardBackCount: 30,
+    randomizeQuestions: true,
+  },
+  [PERCIKAN_AWAL_DECK_ID]: {
+    assetDirectory: '/assets/decks/percikan-awal/cards',
+    cardBackCount: 30,
+    randomizeQuestions: true,
+  },
+  [MERAJUT_KISAH_DECK_ID]: {
+    assetDirectory: '/assets/decks/merajut-kisah/cards',
+    cardBackCount: 30,
+    randomizeQuestions: true,
+  },
+  [JARAK_DAN_RINDU_DECK_ID]: {
+    assetDirectory: '/assets/decks/jarak-dan-rindu/cards',
+    cardBackCount: 30,
+    randomizeQuestions: true,
+  },
+};
 
 export function getBoardCardBackImageSrc(deckId: string, position: number): string | undefined {
-  if (
-    deckId !== TITIK_TEMU_DECK_ID ||
-    position < 0 ||
-    position >= TITIK_TEMU_CARD_BACK_COUNT
-  ) {
+  const config = BOARD_CARD_BACK_CONFIGS[deckId];
+
+  if (!config || position < 0 || position >= config.cardBackCount) {
     return undefined;
   }
 
   const assetNumber = (position + 1).toString().padStart(2, '0');
-  return `/assets/decks/titik-temu/cards/${assetNumber}.svg`;
+  return `${config.assetDirectory}/${assetNumber}.svg`;
+}
+
+export function shouldRandomizeBoardQuestions(deckId: string) {
+  return Boolean(BOARD_CARD_BACK_CONFIGS[deckId]?.randomizeQuestions);
 }
