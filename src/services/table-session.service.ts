@@ -1,5 +1,10 @@
+import { randomInt } from 'crypto';
 import { ApiError } from '../lib/api-response';
 import { prisma } from '../lib/prisma';
+import {
+  getBoardCardBackImageSrc,
+  TITIK_TEMU_DECK_ID,
+} from '../data/cardBackImages';
 import type { Deck, TableSession } from '../types';
 import { sortCardsByPhase, toConversationCard } from './card.service';
 
@@ -13,6 +18,17 @@ function getActiveSessionExpiresAt(now = new Date()) {
 
 function isPast(date: Date | null | undefined, now = new Date()) {
   return Boolean(date && date <= now);
+}
+
+function shuffle<T>(items: T[]) {
+  const next = [...items];
+
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(index + 1);
+    [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+  }
+
+  return next;
 }
 
 function serializeDeck(deck: TableSessionRecord['deck']): Deck {
@@ -57,7 +73,10 @@ function serializeTableSession(session: TableSessionRecord): TableSession {
       isRevealed: state.isRevealed,
       revealedAt: state.revealedAt?.toISOString(),
       revealedByUserId: state.revealedByUserId ?? undefined,
-      card: toConversationCard(state.card),
+      card: {
+        ...toConversationCard(state.card),
+        cardBackImageSrc: getBoardCardBackImageSrc(session.deckId, state.position),
+      },
     })),
   };
 }
@@ -108,7 +127,8 @@ export async function createTableSession(userId: string, deckId: string) {
     throw new ApiError(404, 'Deck not found');
   }
 
-  const cards = sortCardsByPhase(deck.cards);
+  const sortedCards = sortCardsByPhase(deck.cards);
+  const cards = deck.id === TITIK_TEMU_DECK_ID ? shuffle(sortedCards) : sortedCards;
 
   if (cards.length === 0) {
     throw new ApiError(409, 'Deck has no playable cards');

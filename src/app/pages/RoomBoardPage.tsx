@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -287,6 +288,7 @@ export default function RoomBoardPage() {
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
               {unrevealedCards.map((card) => {
                 const showBusy = isRevealing === card.id;
+                const cardBackImageSrc = card.card.cardBackImageSrc;
 
                 return (
                   <button
@@ -297,17 +299,30 @@ export default function RoomBoardPage() {
                     aria-label={`Buka kartu ${card.position + 1}`}
                     className="group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] bg-[#ffe087] text-left transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b1b] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] disabled:opacity-60"
                   >
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3">
+                    <div
+                      className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
+                        cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
+                      }`}
+                    >
+                      {cardBackImageSrc && (
+                        <Image
+                          src={cardBackImageSrc}
+                          alt=""
+                          fill
+                          sizes="(min-width: 768px) 20vw, 33vw"
+                          className="object-cover"
+                        />
+                      )}
                       {showBusy ? (
                         <Loader2 className="h-5 w-5 animate-spin text-[#a93718]" />
-                      ) : (
+                      ) : !cardBackImageSrc ? (
                         <>
                           <span className="text-3xl md:text-4xl">{room.deck.icon}</span>
                           <span className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718]">
                             #{card.position + 1}
                           </span>
                         </>
-                      )}
+                      ) : null}
                     </div>
                   </button>
                 );

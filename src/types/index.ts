@@ -67,6 +67,7 @@ export type ConversationCard = {
   isPremium: boolean;
   isActive: boolean;
   sortOrder: number;
+  cardBackImageSrc?: string;
 };
 
 export type SessionStatus = 'active' | 'completed' | 'abandoned' | 'expired';

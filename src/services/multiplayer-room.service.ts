@@ -1,4 +1,5 @@
 import { randomInt } from 'crypto';
+import { getBoardCardBackImageSrc } from '../data/cardBackImages';
 import { ApiError } from '../lib/api-response';
 import { prisma } from '../lib/prisma';
 import type { Deck, MultiplayerRoom } from '../types';
@@ -129,7 +130,10 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     revealedAt: state.revealedAt?.toISOString(),
     revealedByPlayerId: state.revealedByPlayerId ?? undefined,
     revealedByPlayerName: state.revealedByPlayer?.displayName,
-    card: toConversationCard(state.card),
+    card: {
+      ...toConversationCard(state.card),
+      cardBackImageSrc: getBoardCardBackImageSrc(room.deckId, state.position),
+    },
   }));
 
   const latestRevealedCard =

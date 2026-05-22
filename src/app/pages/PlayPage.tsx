@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -151,6 +152,7 @@ export default function PlayPage() {
   const isFavorite = activeSession.favoriteCardIds.includes(currentCard.id);
   const progress = activeSession.viewedCardIds.length + activeSession.skippedCardIds.length;
   const total = deckCards.length;
+  const cardBackImageSrc = currentCard.cardBackImageSrc;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#fcf9f8] relative">
@@ -219,16 +221,30 @@ export default function PlayPage() {
                   }}
                 >
                   <div
-                    className="size-full border-4 border-[#1c1b1b] rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_#1c1b1b] flex flex-col items-center justify-center gap-6"
-                    style={{ backgroundColor: deck.color || '#ffe087' }}
+                    className="relative size-full border-4 border-[#1c1b1b] rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_#1c1b1b] flex flex-col items-center justify-center gap-6"
+                    style={!cardBackImageSrc ? { backgroundColor: deck.color || '#ffe087' } : undefined}
                   >
-                    <div className="text-6xl md:text-8xl">{deck.icon}</div>
-                    <div className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[32px] md:text-[48px] text-[#1c1b1b] text-center tracking-[-0.96px]">
-                      {deck.name}
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-sm border-2 border-[#1c1b1b] rounded-xl px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-center motion-safe:animate-pulse shadow-[2px_2px_0px_#1c1b1b]">
-                      Ketuk untuk membuka kartu
-                    </div>
+                    {cardBackImageSrc ? (
+                      <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                        <Image
+                          src={cardBackImageSrc}
+                          alt=""
+                          fill
+                          sizes="100vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-6xl md:text-8xl">{deck.icon}</div>
+                        <div className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[32px] md:text-[48px] text-[#1c1b1b] text-center tracking-[-0.96px]">
+                          {deck.name}
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm border-2 border-[#1c1b1b] rounded-xl px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-center motion-safe:animate-pulse shadow-[2px_2px_0px_#1c1b1b]">
+                          Ketuk untuk membuka kartu
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 

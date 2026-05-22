@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -197,6 +198,7 @@ export default function TablePlayPage() {
             {session.cards.map((state) => {
               const isSelected = selectedCardId === state.id;
               const showBusy = isRevealing === state.id;
+              const cardBackImageSrc = state.card.cardBackImageSrc;
 
               return (
                 <button
@@ -215,7 +217,11 @@ export default function TablePlayPage() {
                       : 'hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
                   } ${state.isRevealed ? 'bg-white' : 'bg-[#ffe087]'}`}
                 >
-                  <div className="absolute inset-0 overflow-hidden rounded-[10px]">
+                  <div
+                    className={`absolute inset-0 overflow-hidden ${
+                      cardBackImageSrc ? 'rounded-xl' : 'rounded-[10px]'
+                    }`}
+                  >
                     <div
                       className="h-full w-full transition-transform duration-500"
                       style={{
@@ -224,22 +230,33 @@ export default function TablePlayPage() {
                       }}
                     >
                       <div
-                        className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3"
+                        className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
+                          cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
+                        }`}
                         style={{
                           backfaceVisibility: 'hidden',
                           WebkitBackfaceVisibility: 'hidden',
                         }}
                       >
+                        {cardBackImageSrc && (
+                          <Image
+                            src={cardBackImageSrc}
+                            alt=""
+                            fill
+                            sizes="(min-width: 768px) 20vw, 33vw"
+                            className="object-cover"
+                          />
+                        )}
                         {showBusy ? (
                           <Loader2 className="h-5 w-5 animate-spin text-[#a93718]" />
-                        ) : (
+                        ) : !cardBackImageSrc ? (
                           <>
                             <span className="text-3xl md:text-4xl">{session.deck.icon}</span>
                             <span className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718]">
                               #{state.position + 1}
                             </span>
                           </>
-                        )}
+                        ) : null}
                       </div>
                       <div
                         className="absolute inset-0 flex items-center justify-center bg-white p-3"
