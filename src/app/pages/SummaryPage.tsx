@@ -1,10 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Heart, Home, Layers, Play } from 'lucide-react';
 import { getSession } from '../../utils/storage';
-import { getDeckById } from '../../data/decks';
+import { getDeckById, getDeckProgressColor } from '../../data/decks';
+import { getDeckCompletionBadgeSrc } from '../../data/deckListingCovers';
 import { useEffect, useState } from 'react';
 import { CardSession } from '../../types';
 
@@ -28,6 +30,9 @@ export default function SummaryPage() {
     return null;
   }
 
+  const deckAccentColor = getDeckProgressColor(deck.slug);
+  const completionBadgeSrc = getDeckCompletionBadgeSrc(deck.slug);
+
   const cardsOpened = session.viewedCardIds.length;
   const cardsSkipped = session.skippedCardIds.length;
   const cardsSaved = session.favoriteCardIds.length;
@@ -37,22 +42,33 @@ export default function SummaryPage() {
       <div className="w-full max-w-2xl">
         {/* Completion Icon */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-[#ffe087] border-4 border-[#1c1b1b] rounded-full shadow-[8px_8px_0px_#1c1b1b] mb-6">
-            <span className="text-5xl">✨</span>
+          <div className="relative inline-flex w-24 h-24 overflow-hidden rounded-full bg-[#ffe087] border-4 border-[#1c1b1b] shadow-[8px_8px_0px_#1c1b1b] mb-6">
+            <Image
+              src={completionBadgeSrc}
+              alt={`${deck.name} completion badge`}
+              fill
+              sizes="96px"
+              className="object-cover"
+            />
           </div>
           <h1 className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[32px] md:text-[48px] text-[#1c1b1b] mb-4 tracking-[-0.96px]">
             Sesi Selesai!
           </h1>
           <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[18px] md:text-[20px] text-[#58413c] mb-8">
             Kalian baru saja membuka {cardsOpened} obrolan dari deck{' '}
-            <span className="font-bold text-[#a93718]">{deck.name}</span>.
+            <span className="font-bold" style={{ color: deckAccentColor }}>
+              {deck.name}
+            </span>.
           </p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 text-center shadow-[4px_4px_0px_#1c1b1b]">
-            <div className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718] mb-2">
+            <div
+              className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold mb-2"
+              style={{ color: deckAccentColor }}
+            >
               {cardsOpened}
             </div>
             <div className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c]">
@@ -60,7 +76,10 @@ export default function SummaryPage() {
             </div>
           </div>
           <div className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 text-center shadow-[4px_4px_0px_#1c1b1b]">
-            <div className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718] mb-2">
+            <div
+              className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold mb-2"
+              style={{ color: deckAccentColor }}
+            >
               {cardsSkipped}
             </div>
             <div className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c]">
@@ -68,7 +87,10 @@ export default function SummaryPage() {
             </div>
           </div>
           <div className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 text-center shadow-[4px_4px_0px_#1c1b1b]">
-            <div className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718] mb-2">
+            <div
+              className="text-4xl font-['Hanken_Grotesk',sans-serif] font-extrabold mb-2"
+              style={{ color: deckAccentColor }}
+            >
               {cardsSaved}
             </div>
             <div className="font-['Hanken_Grotesk',sans-serif] font-medium text-sm text-[#58413c]">
@@ -102,7 +124,8 @@ export default function SummaryPage() {
           {/* Play Again */}
           <Link
             href={`/decks/${deck.slug}`}
-            className="flex items-center gap-4 p-6 bg-[#ff7551] border-2 border-[#1c1b1b] rounded-xl shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
+            style={{ backgroundColor: deckAccentColor }}
+            className="flex items-center gap-4 p-6 border-2 border-[#1c1b1b] rounded-xl shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
           >
             <div className="bg-white p-3 rounded-lg border-2 border-[#1c1b1b]">
               <Play className="w-6 h-6 text-[#a93718]" fill="#a93718" />

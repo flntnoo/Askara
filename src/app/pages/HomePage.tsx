@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { Play, Heart, Sparkles } from 'lucide-react';
 import { getActiveSession, getFavorites, getOnboardingPreference } from '../../utils/storage';
-import { getAllDecks, getDeckCategoryLabel } from '../../data/decks';
+import { getAllDecks } from '../../data/decks';
 import { useEffect, useState } from 'react';
 import { CardSession } from '../../types';
 import { getRecommendedDecks } from '../../utils/recommendationEngine';
 import { useFavoriteStore } from '../../stores/favoriteStore';
 import { useOnboardingStore } from '../../stores/onboardingStore';
+import DeckCard from '../components/DeckCard';
 
 export default function HomePage() {
   const [activeSession, setActiveSession] = useState<CardSession | null>(null);
@@ -97,32 +98,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {recommendedDecks.map((deck) => (
-              <Link
-                key={deck.id}
-                href={`/decks/${deck.slug}`}
-                className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
-              >
-                <div
-                  className="w-full h-32 rounded-lg mb-4 flex items-center justify-center border-2 border-[#1c1b1b] text-4xl"
-                  style={{ backgroundColor: deck.color }}
-                >
-                  {deck.icon}
-                </div>
-                <h3 className="font-['Hanken_Grotesk',sans-serif] font-bold text-xl text-[#1c1b1b] mb-1">
-                  {deck.name}
-                </h3>
-                <div className="font-['Hanken_Grotesk',sans-serif] font-bold text-xs uppercase tracking-[0.08em] text-[#a93718] mb-2">
-                  {getDeckCategoryLabel(deck.category)}
-                </div>
-                <p className="font-['Hanken_Grotesk',sans-serif] font-normal text-sm text-[#58413c] mb-3">
-                  {deck.shortDescription}
-                </p>
-                <div className="flex items-center gap-2 text-xs text-[#58413c] font-['Hanken_Grotesk',sans-serif]">
-                  <span>{deck.cardCount} kartu</span>
-                  <span>&bull;</span>
-                  <span>{deck.estimatedDuration}</span>
-                </div>
-              </Link>
+              <DeckCard key={deck.id} deck={deck} />
             ))}
           </div>
         </div>

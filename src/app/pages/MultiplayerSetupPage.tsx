@@ -1,14 +1,16 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { ArrowLeft, Loader2, LogIn, Plus, UsersRound } from 'lucide-react';
-import { getDeckBySlug, getDeckCategoryLabel } from '../../data/decks';
-import { apiRequest } from '../../lib/api-client';
+import { getDeckListingCoverSrc } from '../../data/deckListingCovers';
+import { getDeckBySlug } from '../../data/decks';
+import { ApiClientError, apiRequest } from '../../lib/api-client';
 import type { MultiplayerRoom } from '../../types';
-import { saveJoinedRoomPlayer } from '../../utils/storage';
+import { saveJoinedRoomPlayer, saveMultiplayerDeckId } from '../../utils/storage';
 
 export default function MultiplayerSetupPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -32,6 +34,12 @@ export default function MultiplayerSetupPage() {
     if (!hasEditedJoinName) setJoinDisplayName(sessionName);
   }, [hasEditedHostName, hasEditedJoinName, session?.user?.name]);
 
+  useEffect(() => {
+    if (deck?.id) {
+      saveMultiplayerDeckId(deck.id);
+    }
+  }, [deck?.id]);
+
   if (!deck) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#fcf9f8] p-6 text-center">
@@ -47,6 +55,8 @@ export default function MultiplayerSetupPage() {
       </div>
     );
   }
+
+  const coverSrc = getDeckListingCoverSrc(deck.slug);
 
   const createRoom = async () => {
     const trimmedHostName = hostName.trim();
@@ -105,6 +115,7 @@ export default function MultiplayerSetupPage() {
       const room = await apiRequest<MultiplayerRoom>(`/api/rooms/${normalizedCode}/join`, {
         method: 'POST',
         body: JSON.stringify({
+          deckId: deck.id,
           displayName: trimmedDisplayName,
         }),
       });
@@ -116,7 +127,14 @@ export default function MultiplayerSetupPage() {
       router.push(`/room/${room.code}/lobby`);
     } catch (joinError) {
       console.error('Failed to join multiplayer room:', joinError);
-      setError('Room code tidak valid atau game sudah dimulai.');
+      if (
+        joinError instanceof ApiClientError &&
+        joinError.message.startsWith('Room ini menggunakan deck')
+      ) {
+        setError(joinError.message);
+      } else {
+        setError('Room code tidak valid atau game sudah dimulai.');
+      }
       setIsJoining(false);
     }
   };
@@ -133,23 +151,23 @@ export default function MultiplayerSetupPage() {
         </Link>
 
         <section className="mb-8 grid gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-center">
-          <div
-            className="flex aspect-[4/3] items-center justify-center rounded-2xl border-4 border-[#1c1b1b] text-6xl shadow-[8px_8px_0px_#1c1b1b]"
-            style={{ backgroundColor: deck.color }}
-          >
-            {deck.icon}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border-4 border-[#1c1b1b] shadow-[8px_8px_0px_#1c1b1b]">
+            <Image
+              src={coverSrc}
+              alt={`${deck.name} cover`}
+              fill
+              sizes="(min-width: 768px) 220px, 70vw"
+              className="object-cover"
+            />
           </div>
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-lg border-2 border-[#1c1b1b] bg-white px-3 py-2 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#58413c]">
               <UsersRound className="h-4 w-4" />
               Multiplayer
             </div>
-            <h1 className="mb-3 font-['Hanken_Grotesk',sans-serif] text-[36px] font-extrabold leading-tight md:text-[52px]">
+            <h1 className="mb-2 font-['Hanken_Grotesk',sans-serif] text-[36px] font-extrabold leading-tight md:text-[52px]">
               {deck.name}
             </h1>
-            <div className="mb-3 inline-flex rounded-lg border-2 border-[#1c1b1b] bg-white px-3 py-1 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#a93718]">
-              {getDeckCategoryLabel(deck.category)}
-            </div>
             <p className="max-w-2xl font-['Hanken_Grotesk',sans-serif] text-lg font-medium text-[#58413c]">
               {deck.description}
             </p>

@@ -170,10 +170,10 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
   const activeTurn =
     room.status === 'active'
       ? getActiveTurn(
-          room.players.filter((player) => player.isActive),
-          room.currentTurnPlayerId,
-          room.turnIndex,
-        )
+        room.players.filter((player) => player.isActive),
+        room.currentTurnPlayerId,
+        room.turnIndex,
+      )
       : null;
 
   return {
@@ -327,9 +327,15 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
   return getMultiplayerRoom(code, userId);
 }
 
-export async function joinMultiplayerRoom(code: string, userId: string, displayName?: string) {
+export async function joinMultiplayerRoom(
+  code: string,
+  userId: string,
+  deckId: string,
+  displayName?: string,
+) {
   const normalizedCode = normalizeRoomCode(code);
   const trimmedDisplayName = displayName?.trim();
+  const trimmedDeckId = deckId?.trim();
 
   if (!trimmedDisplayName) {
     throw new ApiError(400, 'Display name is required');
@@ -345,6 +351,13 @@ export async function joinMultiplayerRoom(code: string, userId: string, displayN
   }
 
   await rejectIfWaitingRoomExpired(room);
+
+  if (!trimmedDeckId || room.deckId !== trimmedDeckId) {
+    throw new ApiError(
+      409,
+      `Room ini menggunakan deck "${room.deck.name}". Silakan pilih deck yang sama untuk bergabung.`,
+    );
+  }
 
   const existingPlayer = await prisma.roomPlayer.findFirst({
     where: {

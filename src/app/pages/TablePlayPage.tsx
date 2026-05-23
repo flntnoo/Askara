@@ -8,6 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, DoorOpen, Loader2, X } from 'lucide-react';
 import type { TableCardState, TableSession } from '../../types';
 import { apiRequest } from '../../lib/api-client';
+import { getDeckProgressColor } from '../../data/decks';
 
 export default function TablePlayPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -55,6 +56,7 @@ export default function TablePlayPage() {
   const revealedCount = session?.cards.filter((state) => state.isRevealed).length ?? 0;
   const totalCount = session?.cards.length ?? 0;
   const progressPercent = totalCount > 0 ? (revealedCount / totalCount) * 100 : 0;
+  const progressColor = getDeckProgressColor(session?.deck?.slug);
   const isComplete = totalCount > 0 && revealedCount === totalCount;
 
   const revealCard = async (state: TableCardState) => {
@@ -169,8 +171,11 @@ export default function TablePlayPage() {
 
       <div className="h-2 border-b-2 border-[#1c1b1b] bg-[#f0edec]">
         <div
-          className="h-full bg-[#ff7551] transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
+          className="h-full transition-all duration-300"
+          style={{
+            width: `${progressPercent}%`,
+            backgroundColor: progressColor,
+          }}
         />
       </div>
 
@@ -211,16 +216,14 @@ export default function TablePlayPage() {
                       ? `Kartu ${state.position + 1}: ${state.card.content}`
                       : `Buka kartu ${state.position + 1}`
                   }
-                  className={`group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] text-left transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] ${
-                    isSelected
+                  className={`group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] text-left transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] ${isSelected
                       ? 'shadow-[4px_4px_0px_#1c1b1b] translate-y-[-2px]'
                       : 'hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-                  } ${state.isRevealed ? 'bg-white' : 'bg-[#ffe087]'}`}
+                    } ${state.isRevealed ? 'bg-white' : 'bg-[#ffe087]'}`}
                 >
                   <div
-                    className={`absolute inset-0 overflow-hidden ${
-                      cardBackImageSrc ? 'rounded-xl' : 'rounded-[10px]'
-                    }`}
+                    className={`absolute inset-0 overflow-hidden ${cardBackImageSrc ? 'rounded-xl' : 'rounded-[10px]'
+                      }`}
                   >
                     <div
                       className="h-full w-full transition-transform duration-500"
@@ -230,9 +233,8 @@ export default function TablePlayPage() {
                       }}
                     >
                       <div
-                        className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
-                          cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
-                        }`}
+                        className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
+                          }`}
                         style={{
                           backfaceVisibility: 'hidden',
                           WebkitBackfaceVisibility: 'hidden',

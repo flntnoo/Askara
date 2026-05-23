@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import RoomJoinForm from '../components/RoomJoinForm';
 import { apiRequest } from '../../lib/api-client';
+import { getDeckListingCoverSrc } from '../../data/deckListingCovers';
 import type { MultiplayerRoom } from '../../types';
 import { saveJoinedRoomPlayer } from '../../utils/storage';
 
@@ -139,6 +141,8 @@ export default function RoomLobbyPage() {
     );
   }
 
+  const coverSrc = getDeckListingCoverSrc(room.deck.slug);
+
   if (!room.currentPlayerId) {
     return (
       <RoomJoinForm
@@ -167,11 +171,14 @@ export default function RoomLobbyPage() {
         </Link>
 
         <section className="mb-6 grid gap-5 md:grid-cols-[220px_minmax(0,1fr)] md:items-center">
-          <div
-            className="flex aspect-[4/3] items-center justify-center rounded-2xl border-4 border-[#1c1b1b] text-6xl shadow-[8px_8px_0px_#1c1b1b]"
-            style={{ backgroundColor: room.deck.color }}
-          >
-            {room.deck.icon}
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border-4 border-[#1c1b1b] shadow-[8px_8px_0px_#1c1b1b]">
+            <Image
+              src={coverSrc}
+              alt={`${room.deck.name} cover`}
+              fill
+              sizes="(min-width: 768px) 220px, 70vw"
+              className="object-cover"
+            />
           </div>
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-lg border-2 border-[#1c1b1b] bg-white px-3 py-2 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#58413c]">
@@ -221,11 +228,7 @@ export default function RoomLobbyPage() {
               </button>
             </div>
 
-            <div className="rounded-lg border-2 border-[#1c1b1b] bg-[#fcf9f8] p-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#58413c]">
-              Pemain lain dapat membuka Play Multiplayer, memasukkan kode {room.code}, lalu menulis nama mereka.
-            </div>
-
-            <div className="mt-5">
+            <div className="mt-4">
               {room.isCurrentUserHost ? (
                 <button
                   type="button"

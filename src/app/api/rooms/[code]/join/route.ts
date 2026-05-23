@@ -16,7 +16,7 @@ export async function POST(req: Request, context: RouteContext) {
     const user = await getCurrentUserOrGuest(req);
     const { code } = await context.params;
     const body = joinRoomSchema.parse(await req.json());
-    const room = await joinMultiplayerRoom(code, user.id, body.displayName);
+    const room = await joinMultiplayerRoom(code, user.id, body.deckId, body.displayName);
 
     return successResponse(room);
   } catch (error) {

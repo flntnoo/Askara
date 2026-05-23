@@ -18,6 +18,7 @@ export const STORAGE_KEYS = {
   sessionHistory: 'dcc_session_history',
   favorites: 'dcc_favorites',
   settings: 'dcc_settings',
+  multiplayerDeckId: 'dcc_multiplayer_deck_id',
   roomPlayers: 'dcc_room_players',
 } as const;
 
@@ -136,11 +137,11 @@ export function migrateLegacyStorageIfNeeded(): void {
 
   const onboarding: OnboardingPreference | undefined = legacy.onboarding
     ? {
-        relationshipType: mapRelationshipType(legacy.onboarding.playingWith),
-        relationshipStage: mapRelationshipStage(legacy.onboarding.situation),
-        preferredTone: mapPreferredTone(legacy.onboarding.vibe),
-        completedOnboarding: Boolean(legacy.onboarding.completedAt),
-      }
+      relationshipType: mapRelationshipType(legacy.onboarding.playingWith),
+      relationshipStage: mapRelationshipStage(legacy.onboarding.situation),
+      preferredTone: mapPreferredTone(legacy.onboarding.vibe),
+      completedOnboarding: Boolean(legacy.onboarding.completedAt),
+    }
     : undefined;
 
   const sessions = (legacy.sessions ?? []).map(migrateLegacySession);
@@ -231,6 +232,15 @@ export function getSettings<T extends Record<string, unknown> = Record<string, u
 
 export function saveSettings<T extends Record<string, unknown>>(settings: T): void {
   writeKey(STORAGE_KEYS.settings, settings);
+}
+
+export function getMultiplayerDeckId(): string | null {
+  return readKey<string | null>(STORAGE_KEYS.multiplayerDeckId, null);
+}
+
+export function saveMultiplayerDeckId(deckId: string): void {
+  if (!deckId) return;
+  writeKey(STORAGE_KEYS.multiplayerDeckId, deckId);
 }
 
 type JoinedRoomPlayer = {

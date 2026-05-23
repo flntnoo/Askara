@@ -189,6 +189,20 @@ export const DECKS: Deck[] = [
   },
 ];
 
+const DECK_PROGRESS_COLORS: Record<string, string> = {
+  'ice-breaker': '#FEDC93',
+  pdkt: '#FBBEB1',
+  pacaran: '#FBC89F',
+  ldr: '#BECFCC',
+  'pra-nikah': '#CCB982',
+  'suami-istri': '#7C996F',
+  konflik: '#566880',
+  apresiasi: '#CD6049',
+  'masa-depan': '#B5B2C1',
+};
+
+const DEFAULT_PROGRESS_COLOR = '#ff7551';
+
 export const getAllDecks = (): Deck[] => {
   return [...DECKS].sort((a, b) => a.sortOrder - b.sortOrder);
 };
@@ -207,4 +221,11 @@ export const getDecksByCategory = (category: DeckCategory): Deck[] => {
 
 export const getDeckCategoryLabel = (category: DeckCategory): string => {
   return DECK_CATEGORY_LABELS[category];
+};
+
+export const getDeckProgressColor = (deckIdOrSlug?: string): string => {
+  if (!deckIdOrSlug) return DEFAULT_PROGRESS_COLOR;
+  const deck = getDeckById(deckIdOrSlug) ?? getDeckBySlug(deckIdOrSlug);
+  const deckSlug = deck?.slug ?? deckIdOrSlug;
+  return DECK_PROGRESS_COLORS[deckSlug] ?? DEFAULT_PROGRESS_COLOR;
 };

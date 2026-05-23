@@ -1,9 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Play, UsersRound } from 'lucide-react';
-import { getDeckBySlug, getDeckCategoryLabel } from '../../data/decks';
+import { getDeckListingCoverSrc } from '../../data/deckListingCovers';
+import { getDeckBySlug, getDeckProgressColor } from '../../data/decks';
 import { getCardsByDeckId } from '../../data/cards';
 import { useSessionStore } from '../../stores/sessionStore';
 
@@ -42,6 +44,8 @@ export default function DeckDetailPage() {
 
   // Get first 3 cards as preview
   const previewCards = cards.slice(0, 3);
+  const coverSrc = getDeckListingCoverSrc(deck.slug);
+  const deckAccentColor = getDeckProgressColor(deck.slug);
 
   return (
     <div className="flex flex-col min-h-screen w-full">
@@ -57,19 +61,19 @@ export default function DeckDetailPage() {
 
         {/* Deck Header */}
         <div className="mb-12">
-          <div
-            className="w-full max-w-md h-48 md:h-64 rounded-2xl mb-6 flex items-center justify-center border-4 border-[#1c1b1b] shadow-[8px_8px_0px_#1c1b1b] text-6xl md:text-8xl"
-            style={{ backgroundColor: deck.color }}
-          >
-            {deck.icon}
+          <div className="relative w-full max-w-md h-48 md:h-64 rounded-2xl mb-6 border-4 border-[#1c1b1b] shadow-[8px_8px_0px_#1c1b1b] overflow-hidden">
+            <Image
+              src={coverSrc}
+              alt={`${deck.name} cover`}
+              fill
+              sizes="(min-width: 768px) 448px, 100vw"
+              className="object-cover"
+            />
           </div>
 
-          <h1 className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[40px] md:text-[56px] text-[#1c1b1b] mb-4 tracking-[-1.12px]">
+          <h1 className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[40px] md:text-[56px] text-[#1c1b1b] mb-3 tracking-[-1.12px]">
             {deck.name}
           </h1>
-          <div className="inline-flex border-2 border-[#1c1b1b] bg-white rounded-lg px-3 py-1 mb-4 font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#a93718]">
-            {getDeckCategoryLabel(deck.category)}
-          </div>
           <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[18px] md:text-[20px] text-[#58413c] mb-6 max-w-2xl">
             {deck.description}
           </p>
@@ -85,7 +89,8 @@ export default function DeckDetailPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleStartDeck}
-              className="bg-[#ff7551] drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-3"
+              style={{ backgroundColor: deckAccentColor }}
+              className="drop-shadow-[4px_4px_0px_#1c1b1b] border-2 border-[#1c1b1b] rounded-xl px-8 py-4 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] text-lg hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all flex items-center justify-center gap-3"
             >
               <Play className="w-5 h-5" fill="#6b1500" />
               Mulai Deck Ini

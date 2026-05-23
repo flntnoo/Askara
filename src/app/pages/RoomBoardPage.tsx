@@ -1,14 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
-  ArrowLeft,
   CheckCircle2,
-  Copy,
   Loader2,
   Trophy,
   UsersRound,
@@ -16,6 +13,7 @@ import {
 } from 'lucide-react';
 import RoomJoinForm from '../components/RoomJoinForm';
 import { apiRequest } from '../../lib/api-client';
+import { getDeckProgressColor } from '../../data/decks';
 import type { MultiplayerRoom, RoomCardState } from '../../types';
 import { saveJoinedRoomPlayer } from '../../utils/storage';
 
@@ -28,6 +26,7 @@ export default function RoomBoardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRevealing, setIsRevealing] = useState<string | null>(null);
   const [isEnding, setIsEnding] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadRoom = useCallback(async (showLoading = false) => {
@@ -87,6 +86,7 @@ export default function RoomBoardPage() {
   const totalCount = room?.cards.length ?? 0;
   const remainingCount = unrevealedCards.length;
   const progressPercent = totalCount > 0 ? (revealedCount / totalCount) * 100 : 0;
+  const progressColor = getDeckProgressColor(room?.deck?.slug);
   const isCurrentPlayerTurn = Boolean(
     room?.currentPlayerId && room.currentPlayerId === room.currentTurnPlayerId,
   );
@@ -142,9 +142,19 @@ export default function RoomBoardPage() {
     }
   };
 
-  const copyCode = async () => {
-    if (!room?.code || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(room.code);
+  const isHost = Boolean(room?.isCurrentUserHost);
+
+  const handleExit = async () => {
+    if (!room) return;
+
+    if (isHost) {
+      await endRoom();
+      setShowExitDialog(false);
+      return;
+    }
+
+    setShowExitDialog(false);
+    router.push(`/multiplayer/${room.deck.slug}`);
   };
 
   if (isLoading) {
@@ -199,29 +209,15 @@ export default function RoomBoardPage() {
     <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b]">
       <header className="border-b-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 py-4 md:px-8">
         <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4">
-          <Link
-            href={`/multiplayer/${room.deck.slug}`}
-            aria-label="Kembali ke setup multiplayer"
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#58413c] hover:text-[#a93718]"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Link>
+          <div className="min-h-11 min-w-11" aria-hidden="true" />
           <div className="min-w-0 text-center">
             <p className="truncate font-['Hanken_Grotesk',sans-serif] text-lg font-extrabold md:text-2xl">
               {room.deck.name}
             </p>
-            <button
-              type="button"
-              onClick={() => void copyCode()}
-              className="inline-flex items-center justify-center gap-2 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#a93718]"
-            >
-              {room.code}
-              <Copy className="h-4 w-4" />
-            </button>
           </div>
           <button
             type="button"
-            onClick={() => void endRoom()}
+            onClick={() => setShowExitDialog(true)}
             disabled={isEnding || room.status === 'completed'}
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#58413c] hover:text-[#a93718] disabled:opacity-45"
             aria-label="Akhiri room"
@@ -233,8 +229,11 @@ export default function RoomBoardPage() {
 
       <div className="h-2 border-b-2 border-[#1c1b1b] bg-[#f0edec]">
         <div
-          className="h-full bg-[#ff7551] transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
+          className="h-full transition-all duration-300"
+          style={{
+            width: `${progressPercent}%`,
+            backgroundColor: progressColor,
+          }}
         />
       </div>
 
@@ -272,56 +271,55 @@ export default function RoomBoardPage() {
 
           {room.status === 'active' ? (
             unrevealedCards.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {unrevealedCards.map((card) => {
-                const showBusy = isRevealing === card.id;
-                const cardBackImageSrc = card.card.cardBackImageSrc;
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+                {unrevealedCards.map((card) => {
+                  const showBusy = isRevealing === card.id;
+                  const cardBackImageSrc = card.card.cardBackImageSrc;
 
-                return (
-                  <button
-                    key={card.id}
-                    type="button"
-                    onClick={() => void revealCard(card)}
-                    disabled={showBusy || room.status !== 'active' || !isCurrentPlayerTurn}
-                    aria-label={`Buka kartu ${card.position + 1}`}
-                    className="group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] bg-[#ffe087] text-left transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b1b] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] disabled:opacity-60"
-                  >
-                    <div
-                      className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
-                        cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
-                      }`}
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      onClick={() => void revealCard(card)}
+                      disabled={showBusy || room.status !== 'active' || !isCurrentPlayerTurn}
+                      aria-label={`Buka kartu ${card.position + 1}`}
+                      className="group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] bg-[#ffe087] text-left transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b1b] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] disabled:opacity-60"
                     >
-                      {cardBackImageSrc && (
-                        <Image
-                          src={cardBackImageSrc}
-                          alt=""
-                          fill
-                          sizes="(min-width: 768px) 20vw, 33vw"
-                          className="object-cover"
-                        />
-                      )}
-                      {showBusy ? (
-                        <Loader2 className="h-5 w-5 animate-spin text-[#a93718]" />
-                      ) : !cardBackImageSrc ? (
-                        <>
-                          <span className="text-3xl md:text-4xl">{room.deck.icon}</span>
-                          <span className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718]">
-                            #{card.position + 1}
-                          </span>
-                        </>
-                      ) : null}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                      <div
+                        className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${cardBackImageSrc ? 'overflow-hidden rounded-xl' : 'p-3'
+                          }`}
+                      >
+                        {cardBackImageSrc && (
+                          <Image
+                            src={cardBackImageSrc}
+                            alt=""
+                            fill
+                            sizes="(min-width: 768px) 20vw, 33vw"
+                            className="object-cover"
+                          />
+                        )}
+                        {showBusy ? (
+                          <Loader2 className="h-5 w-5 animate-spin text-[#a93718]" />
+                        ) : !cardBackImageSrc ? (
+                          <>
+                            <span className="text-3xl md:text-4xl">{room.deck.icon}</span>
+                            <span className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[#a93718]">
+                              #{card.position + 1}
+                            </span>
+                          </>
+                        ) : null}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             ) : (
-            <div className="flex min-h-[260px] flex-col items-center justify-center border-4 border-[#1c1b1b] bg-white p-8 text-center shadow-[6px_6px_0px_#1c1b1b]">
-              <Trophy className="mb-4 h-10 w-10 text-[#a93718]" />
-              <h2 className="font-['Hanken_Grotesk',sans-serif] text-2xl font-extrabold">
-                Semua kartu sudah terbuka
-              </h2>
-            </div>
+              <div className="flex min-h-[260px] flex-col items-center justify-center border-4 border-[#1c1b1b] bg-white p-8 text-center shadow-[6px_6px_0px_#1c1b1b]">
+                <Trophy className="mb-4 h-10 w-10 text-[#a93718]" />
+                <h2 className="font-['Hanken_Grotesk',sans-serif] text-2xl font-extrabold">
+                  Semua kartu sudah terbuka
+                </h2>
+              </div>
             )
           ) : (
             <div className="flex min-h-[260px] flex-col items-center justify-center border-4 border-[#1c1b1b] bg-white p-8 text-center shadow-[6px_6px_0px_#1c1b1b]">
@@ -381,9 +379,8 @@ export default function RoomBoardPage() {
               {room.players.map((player) => (
                 <div
                   key={player.id}
-                  className={`flex items-center justify-between rounded-lg border-2 border-[#1c1b1b] px-3 py-2 font-['Hanken_Grotesk',sans-serif] font-bold ${
-                    player.id === room.currentTurnPlayerId ? 'bg-[#ffe087]' : 'bg-[#fcf9f8]'
-                  }`}
+                  className={`flex items-center justify-between rounded-lg border-2 border-[#1c1b1b] px-3 py-2 font-['Hanken_Grotesk',sans-serif] font-bold ${player.id === room.currentTurnPlayerId ? 'bg-[#ffe087]' : 'bg-[#fcf9f8]'
+                    }`}
                 >
                   <span>{player.displayName}</span>
                   <span className="text-xs uppercase text-[#58413c]">{player.role}</span>
@@ -393,6 +390,40 @@ export default function RoomBoardPage() {
           </section>
         </aside>
       </main>
+
+      {showExitDialog && room.status === 'active' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl border-4 border-[#1c1b1b] bg-white p-8 shadow-[8px_8px_0px_#1c1b1b]">
+            <h3 className="mb-4 font-['Hanken_Grotesk',sans-serif] text-2xl font-bold text-[#1c1b1b]">
+              Akhiri Sesi?
+            </h3>
+            <p className="mb-6 font-['Hanken_Grotesk',sans-serif] font-medium text-[#58413c]">
+              {isHost
+                ? 'Yakin ingin mengakhiri sesi multiplayer ini sekarang?'
+                : 'Yakin ingin meninggalkan sesi multiplayer ini sekarang?'}
+            </p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setShowExitDialog(false)}
+                aria-label="close"
+                className="flex-1 min-h-11 rounded-lg border-2 border-[#1c1b1b] bg-[#f0edec] px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] transition-all hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_#1c1b1b]"
+              >
+                Lanjut Main
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleExit()}
+                disabled={isEnding}
+                style={{ backgroundColor: progressColor }}
+                className="flex-1 min-h-11 rounded-lg border-2 border-[#1c1b1b] px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] transition-all hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] disabled:opacity-60"
+              >
+                {isHost ? 'Akhiri' : 'Keluar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

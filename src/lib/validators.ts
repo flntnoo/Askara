@@ -37,6 +37,7 @@ export const createRoomSchema = z.object({
 });
 
 export const joinRoomSchema = z.object({
+  deckId: z.string().min(1),
   displayName: z
     .string({ required_error: 'Display name is required' })
     .trim()

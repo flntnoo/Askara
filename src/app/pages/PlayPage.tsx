@@ -4,10 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Heart, SkipForward, ChevronRight, X } from 'lucide-react';
 import { CARDS } from '../../data/cards';
-import { getDeckById } from '../../data/decks';
+import { getDeckListingCoverSrc } from '../../data/deckListingCovers';
+import { getDeckById, getDeckProgressColor } from '../../data/decks';
 import { ConversationCard } from '../../types';
 import { getNextCard } from '../../utils/cardEngine';
 import { useFavoriteStore } from '../../stores/favoriteStore';
@@ -64,11 +66,11 @@ export default function PlayPage() {
       canKeepExisting && existingCurrent
         ? existingCurrent
         : getNextCard({
-            deckId: activeSession.deckId,
-            allCards: CARDS,
-            viewedCardIds: activeSession.viewedCardIds,
-            skippedCardIds: activeSession.skippedCardIds,
-          });
+          deckId: activeSession.deckId,
+          allCards: CARDS,
+          viewedCardIds: activeSession.viewedCardIds,
+          skippedCardIds: activeSession.skippedCardIds,
+        });
 
     if (!nextCard) {
       endSession();
@@ -152,7 +154,9 @@ export default function PlayPage() {
   const isFavorite = activeSession.favoriteCardIds.includes(currentCard.id);
   const progress = activeSession.viewedCardIds.length + activeSession.skippedCardIds.length;
   const total = deckCards.length;
-  const cardBackImageSrc = currentCard.cardBackImageSrc;
+  const deckCoverSrc = getDeckListingCoverSrc(deck.slug);
+  const deckAccentColor = getDeckProgressColor(deck.slug);
+  const deckAccentStyle = { '--deck-accent': deckAccentColor } as CSSProperties;
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#fcf9f8] relative">
@@ -160,7 +164,8 @@ export default function PlayPage() {
         <button
           onClick={() => setShowEndDialog(true)}
           aria-label="close"
-          className="min-h-11 min-w-11 flex items-center justify-center text-[#58413c] hover:text-[#a93718] transition-colors"
+          style={deckAccentStyle}
+          className="min-h-11 min-w-11 flex items-center justify-center text-[#58413c] hover:text-[var(--deck-accent)] active:text-[var(--deck-accent)] transition-colors"
         >
           <X className="w-6 h-6" />
         </button>
@@ -168,7 +173,10 @@ export default function PlayPage() {
           <span className="font-['Hanken_Grotesk',sans-serif] font-bold text-sm md:text-base text-[#58413c]">
             {deck.name}
           </span>
-          <span className="font-['Hanken_Grotesk',sans-serif] font-bold text-sm md:text-base text-[#a93718]">
+          <span
+            className="font-['Hanken_Grotesk',sans-serif] font-bold text-sm md:text-base"
+            style={{ color: deckAccentColor }}
+          >
             {progress}/{total}
           </span>
         </div>
@@ -176,8 +184,11 @@ export default function PlayPage() {
 
       <div className="w-full h-2 bg-[#f0edec] border-b-2 border-[#1c1b1b]">
         <div
-          className="h-full bg-[#ff7551] transition-all duration-300"
-          style={{ width: `${total > 0 ? (progress / total) * 100 : 0}%` }}
+          className="h-full transition-all duration-300"
+          style={{
+            width: `${total > 0 ? (progress / total) * 100 : 0}%`,
+            backgroundColor: deckAccentColor,
+          }}
         />
       </div>
 
@@ -212,39 +223,25 @@ export default function PlayPage() {
                 }}
               >
                 <div
-                  className={`absolute inset-0 hover:scale-105 transition-transform ${
-                    isFlipped ? 'pointer-events-none' : ''
-                  }`}
+                  className={`absolute inset-0 hover:scale-105 transition-transform ${isFlipped ? 'pointer-events-none' : ''
+                    }`}
                   style={{
                     backfaceVisibility: 'hidden',
                     WebkitBackfaceVisibility: 'hidden',
                   }}
                 >
                   <div
-                    className="relative size-full border-4 border-[#1c1b1b] rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_#1c1b1b] flex flex-col items-center justify-center gap-6"
-                    style={!cardBackImageSrc ? { backgroundColor: deck.color || '#ffe087' } : undefined}
+                    className="relative size-full border-4 border-[#1c1b1b] rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_#1c1b1b] flex flex-col items-center justify-center gap-6 overflow-hidden"
                   >
-                    {cardBackImageSrc ? (
-                      <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                        <Image
-                          src={cardBackImageSrc}
-                          alt=""
-                          fill
-                          sizes="100vw"
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <div className="text-6xl md:text-8xl">{deck.icon}</div>
-                        <div className="font-['Hanken_Grotesk',sans-serif] font-extrabold text-[32px] md:text-[48px] text-[#1c1b1b] text-center tracking-[-0.96px]">
-                          {deck.name}
-                        </div>
-                        <div className="bg-white/80 backdrop-blur-sm border-2 border-[#1c1b1b] rounded-xl px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] text-center motion-safe:animate-pulse shadow-[2px_2px_0px_#1c1b1b]">
-                          Ketuk untuk membuka kartu
-                        </div>
-                      </>
-                    )}
+                    <div className="absolute inset-0">
+                      <Image
+                        src={deckCoverSrc}
+                        alt={`${deck.name} cover`}
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -284,11 +281,10 @@ export default function PlayPage() {
                 aria-label="favorite"
                 aria-pressed={isFavorite}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-                className={`min-h-11 flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-[#1c1b1b] transition-all ${
-                  isFavorite
-                    ? 'bg-[#ffe087] shadow-[4px_4px_0px_#1c1b1b]'
-                    : 'bg-white hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-                }`}
+                className={`min-h-11 flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-[#1c1b1b] transition-all ${isFavorite
+                  ? 'bg-[#ffe087] shadow-[4px_4px_0px_#1c1b1b]'
+                  : 'bg-white hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
+                  }`}
               >
                 <Heart
                   className={`w-6 h-6 ${isFavorite ? 'text-[#a93718]' : 'text-[#58413c]'}`}
@@ -315,7 +311,8 @@ export default function PlayPage() {
                 type="button"
                 onClick={handleNext}
                 aria-label="next"
-                className="min-h-11 flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-[#1c1b1b] bg-[#ff7551] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
+                style={{ backgroundColor: deckAccentColor }}
+                className="min-h-11 flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-[#1c1b1b] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
               >
                 <ChevronRight className="w-6 h-6 text-[#6b1500]" />
                 <span className="font-['Hanken_Grotesk',sans-serif] font-bold text-sm text-[#6b1500]">
@@ -348,7 +345,8 @@ export default function PlayPage() {
               <button
                 type="button"
                 onClick={completeAndGoToSummary}
-                className="flex-1 min-h-11 bg-[#ff7551] border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
+                style={{ backgroundColor: deckAccentColor }}
+                className="flex-1 min-h-11 border-2 border-[#1c1b1b] rounded-lg px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] transition-all"
               >
                 Akhiri
               </button>

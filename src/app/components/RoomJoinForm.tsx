@@ -1,11 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Loader2, LogIn, UsersRound } from 'lucide-react';
-import { apiRequest } from '../../lib/api-client';
+import { ApiClientError, apiRequest } from '../../lib/api-client';
 import type { MultiplayerRoom } from '../../types';
-import { saveJoinedRoomPlayer } from '../../utils/storage';
+import { getMultiplayerDeckId, saveJoinedRoomPlayer } from '../../utils/storage';
 
 type RoomJoinFormProps = {
   code: string;
@@ -20,6 +21,13 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const normalizedCode = (room?.code ?? code).trim().toUpperCase();
+  const joinDeckId = getMultiplayerDeckId();
+  const roomDeck = room?.deck;
+  const deckMismatch = roomDeck ? joinDeckId !== roomDeck.id : false;
+  const deckMismatchMessage = roomDeck
+    ? `Room ini menggunakan deck "${roomDeck.name}". Silakan pilih deck yang sama untuk bergabung.`
+    : 'Pilih deck yang sama untuk bergabung.';
+  const visibleError = error ?? (deckMismatch ? deckMismatchMessage : null);
 
   useEffect(() => {
     const sessionName = session?.user?.name?.trim();
@@ -39,6 +47,11 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
       return;
     }
 
+    if (!joinDeckId || (roomDeck && joinDeckId !== roomDeck.id)) {
+      setError(deckMismatchMessage);
+      return;
+    }
+
     setIsJoining(true);
     setError(null);
 
@@ -46,6 +59,7 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
       const joinedRoom = await apiRequest<MultiplayerRoom>(`/api/rooms/${normalizedCode}/join`, {
         method: 'POST',
         body: JSON.stringify({
+          deckId: joinDeckId,
           displayName: trimmedName,
         }),
       });
@@ -57,7 +71,14 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
       onJoined(joinedRoom);
     } catch (joinError) {
       console.error('Failed to join multiplayer room:', joinError);
-      setError('Room belum bisa di-join. Pastikan kode benar dan game belum dimulai.');
+      if (
+        joinError instanceof ApiClientError &&
+        joinError.message.startsWith('Room ini menggunakan deck')
+      ) {
+        setError(joinError.message);
+      } else {
+        setError('Room belum bisa di-join. Pastikan kode benar dan game belum dimulai.');
+      }
     } finally {
       setIsJoining(false);
     }
@@ -81,10 +102,19 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
             Pilih nama yang akan terlihat oleh pemain lain di room ini.
           </p>
 
-          {error && (
+          {visibleError && (
             <div className="mb-4 border-2 border-[#1c1b1b] bg-[#ffe087] px-4 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500]">
-              {error}
+              {visibleError}
             </div>
+          )}
+
+          {deckMismatch && roomDeck && (
+            <Link
+              href={`/multiplayer/${roomDeck.slug}`}
+              className="mb-4 inline-flex min-h-11 w-full items-center justify-center rounded-lg border-2 border-[#1c1b1b] bg-white px-4 py-2 font-['Hanken_Grotesk',sans-serif] font-bold text-[#1c1b1b] shadow-[3px_3px_0px_#1c1b1b] transition-all hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b]"
+            >
+              Buka deck {roomDeck.name}
+            </Link>
           )}
 
           <label className="mb-2 block font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#58413c]">
@@ -112,7 +142,7 @@ export default function RoomJoinForm({ code, room, onJoined }: RoomJoinFormProps
 
           <button
             type="submit"
-            disabled={isJoining}
+            disabled={isJoining || deckMismatch}
             className="min-h-11 w-full rounded-lg border-2 border-[#1c1b1b] bg-[#ff7551] px-5 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] transition-all hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] disabled:opacity-60"
           >
             <span className="inline-flex items-center justify-center gap-2">
