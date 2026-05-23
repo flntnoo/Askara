@@ -91,6 +91,7 @@ export default function RoomBoardPage() {
     room?.currentPlayerId && room.currentPlayerId === room.currentTurnPlayerId,
   );
   const isComplete = totalCount > 0 && remainingCount === 0;
+  const isHost = room?.currentPlayerRole === 'host';
 
   const revealCard = async (card: RoomCardState) => {
     if (
@@ -142,19 +143,10 @@ export default function RoomBoardPage() {
     }
   };
 
-  const isHost = Boolean(room?.isCurrentUserHost);
-
-  const handleExit = async () => {
+  const confirmEndRoom = async () => {
     if (!room) return;
-
-    if (isHost) {
-      await endRoom();
-      setShowExitDialog(false);
-      return;
-    }
-
+    await endRoom();
     setShowExitDialog(false);
-    router.push(`/multiplayer/${room.deck.slug}`);
   };
 
   if (isLoading) {
@@ -208,22 +200,21 @@ export default function RoomBoardPage() {
   return (
     <div className="min-h-screen bg-[#fcf9f8] text-[#1c1b1b]">
       <header className="border-b-2 border-[#1c1b1b] bg-[#fcf9f8] px-4 py-4 md:px-8">
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4">
-          <div className="min-h-11 min-w-11" aria-hidden="true" />
-          <div className="min-w-0 text-center">
-            <p className="truncate font-['Hanken_Grotesk',sans-serif] text-lg font-extrabold md:text-2xl">
-              {room.deck.name}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowExitDialog(true)}
-            disabled={isEnding || room.status === 'completed'}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#58413c] hover:text-[#a93718] disabled:opacity-45"
-            aria-label="Akhiri room"
-          >
-            {isEnding ? <Loader2 className="h-5 w-5 animate-spin" /> : <X className="h-6 w-6" />}
-          </button>
+        <div className="relative mx-auto flex max-w-[1180px] items-center justify-center px-12">
+          <p className="truncate text-center font-['Hanken_Grotesk',sans-serif] text-lg font-extrabold md:text-2xl">
+            {room.deck.name}
+          </p>
+          {isHost && (
+            <button
+              type="button"
+              onClick={() => setShowExitDialog(true)}
+              disabled={isEnding || room.status === 'completed'}
+              className="absolute right-4 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-[#58413c] hover:text-[#a93718] disabled:opacity-45 md:right-8"
+              aria-label="Akhiri room"
+            >
+              {isEnding ? <Loader2 className="h-5 w-5 animate-spin" /> : <X className="h-6 w-6" />}
+            </button>
+          )}
         </div>
       </header>
 
@@ -391,16 +382,14 @@ export default function RoomBoardPage() {
         </aside>
       </main>
 
-      {showExitDialog && room.status === 'active' && (
+      {showExitDialog && room.status === 'active' && isHost && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl border-4 border-[#1c1b1b] bg-white p-8 shadow-[8px_8px_0px_#1c1b1b]">
             <h3 className="mb-4 font-['Hanken_Grotesk',sans-serif] text-2xl font-bold text-[#1c1b1b]">
               Akhiri Sesi?
             </h3>
             <p className="mb-6 font-['Hanken_Grotesk',sans-serif] font-medium text-[#58413c]">
-              {isHost
-                ? 'Yakin ingin mengakhiri sesi multiplayer ini sekarang?'
-                : 'Yakin ingin meninggalkan sesi multiplayer ini sekarang?'}
+              Yakin ingin mengakhiri sesi multiplayer ini sekarang?
             </p>
             <div className="flex gap-4">
               <button
@@ -413,12 +402,12 @@ export default function RoomBoardPage() {
               </button>
               <button
                 type="button"
-                onClick={() => void handleExit()}
+                onClick={() => void confirmEndRoom()}
                 disabled={isEnding}
                 style={{ backgroundColor: progressColor }}
                 className="flex-1 min-h-11 rounded-lg border-2 border-[#1c1b1b] px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] transition-all hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b] disabled:opacity-60"
               >
-                {isHost ? 'Akhiri' : 'Keluar'}
+                Akhiri
               </button>
             </div>
           </div>
