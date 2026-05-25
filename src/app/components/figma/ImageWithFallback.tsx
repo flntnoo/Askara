@@ -8,7 +8,7 @@ export function ImageWithFallback(props: ImageProps) {
   const [didError, setDidError] = useState(false)
 
   const { src, alt, style, className, width, height, fill, onError, ...rest } = props
-  const originalUrl = typeof src === 'string' ? src : src.src
+  const originalUrl = typeof src === 'string' ? src : 'src' in src ? src.src : src.default.src
   const imageSizing = fill ? { fill: true } : { width, height }
   const fallbackSizing = fill ? { fill: true } : { width: width ?? 88, height: height ?? 88 }
 

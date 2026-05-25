@@ -164,7 +164,7 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     revealedByPlayerName: state.revealedByPlayer?.displayName,
     card: {
         ...card,
-      cardBackImageSrc: getBoardCardBackImageSrc(room.deckId, state.position),
+      cardBackImageSrc: getBoardCardBackImageSrc(room.deckId),
     },
     };
   });

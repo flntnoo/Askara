@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser(req);
+    const user = await getCurrentUser();
 
     if (!user) {
       throw new ApiError(401, 'Google sign-in is required before linking guest data');

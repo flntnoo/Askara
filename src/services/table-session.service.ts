@@ -75,7 +75,7 @@ function serializeTableSession(session: TableSessionRecord): TableSession {
       revealedByUserId: state.revealedByUserId ?? undefined,
       card: {
         ...toConversationCard(state.card),
-        cardBackImageSrc: getBoardCardBackImageSrc(session.deckId, state.position),
+        cardBackImageSrc: getBoardCardBackImageSrc(session.deckId),
       },
     })),
   };
