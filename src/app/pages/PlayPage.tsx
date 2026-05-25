@@ -255,7 +255,7 @@ export default function PlayPage() {
                 >
                   <div className="size-full bg-white border-4 border-[#1c1b1b] rounded-2xl p-8 md:p-12 shadow-[8px_8px_0px_#1c1b1b] flex items-center justify-center">
                     <p className="font-['Hanken_Grotesk',sans-serif] font-bold text-[24px] md:text-[32px] text-[#1c1b1b] text-center leading-relaxed">
-                      "{currentCard.content}"
+                      &ldquo;{currentCard.content}&rdquo;
                     </p>
                   </div>
                 </div>

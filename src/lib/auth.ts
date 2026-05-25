@@ -6,7 +6,7 @@ export function getAnonymousId(req: Request): string | null {
   return req.headers.get('x-anonymous-id');
 }
 
-export async function getCurrentUser(_req?: Request) {
+export async function getCurrentUser() {
   let session = null;
 
   try {

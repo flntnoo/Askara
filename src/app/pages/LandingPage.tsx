@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import svgPaths from '../../imports/Html→Body/svg-qb52pbrj0u';
 import imgImage from '../../imports/Html→Body/66a613613943ccc4bb9a7a0a94d3d47d22fb179b.png';
@@ -213,10 +214,10 @@ function DecorativeAbstractHeroImageBox() {
       <div className="content-stretch flex items-center justify-center overflow-clip p-[4px] relative rounded-[inherit] size-full">
         <div className="flex-[1_0_0] h-full min-w-px mix-blend-multiply opacity-80 relative">
           <div className="absolute bg-clip-padding border-0 border-[transparent] border-solid inset-0 overflow-hidden pointer-events-none">
-            <img
+            <Image
               alt=""
               className="absolute h-full left-[-0.39%] max-w-none top-0 w-[100.77%]"
-              src={imgImage.src}
+              src={imgImage}
             />
           </div>
         </div>
@@ -385,10 +386,10 @@ function ArticleDeckCard1LargeSpan() {
         <div className="content-stretch flex flex-col items-start justify-end p-[20px] md:p-[28px] relative size-full">
           <div className="absolute inset-[4px_4.01px_4px_4px] mix-blend-overlay opacity-50">
             <div className="absolute bg-clip-padding border-0 border-[transparent] border-solid inset-0 overflow-hidden pointer-events-none">
-              <img
+              <Image
                 alt=""
                 className="absolute h-full left-[-15.63%] max-w-none top-0 w-[131.26%]"
-                src={imgImage1.src}
+                src={imgImage1}
               />
             </div>
           </div>

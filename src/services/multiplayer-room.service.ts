@@ -1,5 +1,6 @@
 import { randomInt } from 'crypto';
 import { getBoardCardBackImageSrc } from '../data/cardBackImages';
+import { getCardById, getCardsByDeckId } from '../data/cards';
 import { ApiError } from '../lib/api-response';
 import { prisma } from '../lib/prisma';
 import type { Deck, MultiplayerRoom } from '../types';
@@ -148,7 +149,11 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
   const currentPlayer = viewerUserId
     ? room.players.find((player) => player.userId === viewerUserId && player.isActive)
     : undefined;
-  const cards = room.roomCards.map((state) => ({
+  const cards = room.roomCards.map((state) => {
+    const canonicalCard = getCardById(state.cardId);
+    const card = canonicalCard ?? toConversationCard(state.card);
+
+    return {
     id: state.id,
     roomId: state.roomId,
     cardId: state.cardId,
@@ -158,10 +163,11 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     revealedByPlayerId: state.revealedByPlayerId ?? undefined,
     revealedByPlayerName: state.revealedByPlayer?.displayName,
     card: {
-      ...toConversationCard(state.card),
+        ...card,
       cardBackImageSrc: getBoardCardBackImageSrc(room.deckId, state.position),
     },
-  }));
+    };
+  });
 
   const latestRevealedCard =
     [...cards]
@@ -273,25 +279,20 @@ export async function createMultiplayerRoom(userId: string, deckId: string, disp
       id: deckId,
       isActive: true,
     },
-    include: {
-      cards: {
-        where: {
-          isActive: true,
-        },
-      },
-    },
   });
 
   if (!deck) {
     throw new ApiError(404, 'Deck not found');
   }
 
-  if (deck.cards.length === 0) {
+  const seedCards = getCardsByDeckId(deckId);
+
+  if (seedCards.length === 0) {
     throw new ApiError(409, 'Deck has no playable cards');
   }
 
   const code = await createUniqueRoomCode();
-  const shuffledCards = shuffle(deck.cards);
+  const shuffledCards = shuffle(seedCards);
   const now = new Date();
 
   await prisma.$transaction(async (tx) => {

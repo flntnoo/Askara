@@ -151,7 +151,7 @@ export default function DeckDetailPage() {
                 className="bg-white border-2 border-[#1c1b1b] rounded-xl p-6 shadow-[4px_4px_0px_#1c1b1b]"
               >
                 <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[#1c1b1b] text-base">
-                  "{card.content}"
+                  &ldquo;{card.content}&rdquo;
                 </p>
               </div>
             ))}

@@ -67,11 +67,10 @@ export default function FavoritesPage() {
               <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
                 <button
                   onClick={() => setSelectedDeck('all')}
-                  className={`min-h-11 px-4 py-2 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold whitespace-nowrap transition-all ${
-                    selectedDeck === 'all'
+                  className={`min-h-11 px-4 py-2 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold whitespace-nowrap transition-all ${selectedDeck === 'all'
                       ? 'bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b]'
                       : 'bg-white text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-                  }`}
+                    }`}
                 >
                   Semua ({favoriteCards.length})
                 </button>
@@ -84,11 +83,10 @@ export default function FavoritesPage() {
                     <button
                       key={deckId}
                       onClick={() => setSelectedDeck(deckId)}
-                      className={`min-h-11 px-4 py-2 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold whitespace-nowrap transition-all ${
-                        selectedDeck === deckId
+                      className={`min-h-11 px-4 py-2 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold whitespace-nowrap transition-all ${selectedDeck === deckId
                           ? 'bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b]'
                           : 'bg-white text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-                      }`}
+                        }`}
                     >
                       {deck?.name} ({count})
                     </button>
@@ -119,7 +117,7 @@ export default function FavoritesPage() {
 
                     {/* Question */}
                     <p className="font-['Hanken_Grotesk',sans-serif] font-medium text-[#1c1b1b] mb-4">
-                      "{card.content}"
+                      &ldquo;{card.content}&rdquo;
                     </p>
 
                     {/* Remove Button */}

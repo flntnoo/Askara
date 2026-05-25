@@ -6,6 +6,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "lint": "next lint",
     "cleanup:stale": "tsx prisma/cleanup-stale.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -80,6 +81,8 @@
     "zustand": "5.0.8"
   },
   "devDependencies": {
+    "eslint": "8.57.0",
+    "eslint-config-next": "15.3.5",
     "@tailwindcss/postcss": "4.1.12",
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "22.19.18",

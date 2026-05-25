@@ -1,3 +1,4 @@
+import Image from "next/image";
 import svgPaths from "./svg-qb52pbrj0u";
 import imgImage from "./66a613613943ccc4bb9a7a0a94d3d47d22fb179b.png";
 import imgImage1 from "./020d3a901f1034f8d75c81427db8c9fb11ba8923.png";
@@ -208,7 +209,7 @@ function DecorativeAbstractHeroImageBox() {
       <div className="content-stretch flex items-center justify-center overflow-clip p-[4px] relative rounded-[inherit] size-full">
         <div className="flex-[1_0_0] h-full min-w-px mix-blend-multiply opacity-80 relative" data-name="Image">
           <div className="absolute bg-clip-padding border-0 border-[transparent] border-solid inset-0 overflow-hidden pointer-events-none">
-            <img alt="" className="absolute h-full left-[-0.39%] max-w-none top-0 w-[100.77%]" src={imgImage.src} />
+            <Image alt="" className="absolute h-full left-[-0.39%] max-w-none top-0 w-[100.77%]" src={imgImage} />
           </div>
         </div>
       </div>
@@ -449,7 +450,7 @@ function ArticleDeckCard1LargeSpan() {
         <div className="content-stretch flex flex-col items-start justify-end p-[28px] relative size-full">
           <div className="absolute inset-[4px_4.01px_4px_4px] mix-blend-overlay opacity-50" data-name="Image">
             <div className="absolute bg-clip-padding border-0 border-[transparent] border-solid inset-0 overflow-hidden pointer-events-none">
-              <img alt="" className="absolute h-full left-[-15.63%] max-w-none top-0 w-[131.26%]" src={imgImage1.src} />
+              <Image alt="" className="absolute h-full left-[-15.63%] max-w-none top-0 w-[131.26%]" src={imgImage1} />
             </div>
           </div>
           <Margin2 />

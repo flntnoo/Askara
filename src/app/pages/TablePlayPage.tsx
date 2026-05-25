@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, DoorOpen, Loader2, X } from 'lucide-react';
@@ -12,7 +12,6 @@ import { getDeckProgressColor } from '../../data/decks';
 
 export default function TablePlayPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
   const [session, setSession] = useState<TableSession | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -217,8 +216,8 @@ export default function TablePlayPage() {
                       : `Buka kartu ${state.position + 1}`
                   }
                   className={`group relative aspect-[3/4] rounded-xl border-2 border-[#1c1b1b] text-left transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-[#ff7551] ${isSelected
-                      ? 'shadow-[4px_4px_0px_#1c1b1b] translate-y-[-2px]'
-                      : 'hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
+                    ? 'shadow-[4px_4px_0px_#1c1b1b] translate-y-[-2px]'
+                    : 'hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
                     } ${state.isRevealed ? 'bg-white' : 'bg-[#ffe087]'}`}
                 >
                   <div
@@ -294,7 +293,7 @@ export default function TablePlayPage() {
                   Kartu #{selectedCard.position + 1}
                 </p>
                 <p className="font-['Hanken_Grotesk',sans-serif] text-2xl font-bold leading-relaxed">
-                  "{selectedCard.card.content}"
+                  &ldquo;{selectedCard.card.content}&rdquo;
                 </p>
               </motion.div>
             ) : (

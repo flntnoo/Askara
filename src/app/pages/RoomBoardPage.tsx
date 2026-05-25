@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -318,6 +319,13 @@ export default function RoomBoardPage() {
               <h2 className="font-['Hanken_Grotesk',sans-serif] text-2xl font-extrabold">
                 Room sudah selesai
               </h2>
+              <Link
+                href="/decks"
+                style={{ backgroundColor: progressColor }}
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-lg border-2 border-[#1c1b1b] px-6 py-3 font-['Hanken_Grotesk',sans-serif] font-bold text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b] transition-all hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#1c1b1b]"
+              >
+                Kembali ke Semua Deck
+              </Link>
             </div>
           )}
         </section>
@@ -336,7 +344,7 @@ export default function RoomBoardPage() {
                   Kartu #{selectedCard.position + 1}
                 </p>
                 <p className="font-['Hanken_Grotesk',sans-serif] text-2xl font-bold leading-relaxed">
-                  "{selectedCard.card.content}"
+                  &ldquo;{selectedCard.card.content}&rdquo;
                 </p>
                 {selectedCard.revealedByPlayerName && (
                   <p className="mt-5 font-['Hanken_Grotesk',sans-serif] text-sm font-bold text-[#58413c]">

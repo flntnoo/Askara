@@ -161,20 +161,20 @@ function Step1({
   selected,
   onSelect,
 }: {
-  selected?: string;
-  onSelect: (value: any) => void;
+  selected?: RelationshipType;
+  onSelect: (value: RelationshipType) => void;
 }) {
   const options: Array<{
     value: RelationshipType;
     label: string;
     icon: string;
   }> = [
-    { value: 'partner', label: 'Pasangan', icon: '❤️' },
-    { value: 'pdkt', label: 'Gebetan / PDKT', icon: '💕' },
-    { value: 'friend', label: 'Sahabat', icon: '🤝' },
-    { value: 'family', label: 'Keluarga', icon: '👨‍👩‍👧‍👦' },
-    { value: 'self', label: 'Diri Sendiri', icon: '🪞' },
-  ];
+      { value: 'partner', label: 'Pasangan', icon: '❤️' },
+      { value: 'pdkt', label: 'Gebetan / PDKT', icon: '💕' },
+      { value: 'friend', label: 'Sahabat', icon: '🤝' },
+      { value: 'family', label: 'Keluarga', icon: '👨‍👩‍👧‍👦' },
+      { value: 'self', label: 'Diri Sendiri', icon: '🪞' },
+    ];
 
   return (
     <div>
@@ -189,11 +189,10 @@ function Step1({
           <button
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${
-              selected === option.value
+            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${selected === option.value
                 ? 'bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b]'
                 : 'bg-white text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-            }`}
+              }`}
           >
             <div className="text-3xl mb-2">{option.icon}</div>
             <div className="text-lg">{option.label}</div>
@@ -208,20 +207,20 @@ function Step2({
   selected,
   onSelect,
 }: {
-  selected?: string;
-  onSelect: (value: any) => void;
+  selected?: RelationshipStage;
+  onSelect: (value: RelationshipStage) => void;
 }) {
   const options: Array<{
     value: RelationshipStage;
     label: string;
     icon: string;
   }> = [
-    { value: 'new', label: 'Baru Dekat', icon: '🌱' },
-    { value: 'dating', label: 'Pacaran', icon: '💑' },
-    { value: 'ldr', label: 'LDR', icon: '✈️' },
-    { value: 'engaged', label: 'Tunangan', icon: '💍' },
-    { value: 'married', label: 'Menikah', icon: '👰' },
-  ];
+      { value: 'new', label: 'Baru Dekat', icon: '🌱' },
+      { value: 'dating', label: 'Pacaran', icon: '💑' },
+      { value: 'ldr', label: 'LDR', icon: '✈️' },
+      { value: 'engaged', label: 'Tunangan', icon: '💍' },
+      { value: 'married', label: 'Menikah', icon: '👰' },
+    ];
 
   return (
     <div>
@@ -236,11 +235,10 @@ function Step2({
           <button
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${
-              selected === option.value
+            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${selected === option.value
                 ? 'bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b]'
                 : 'bg-white text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-            }`}
+              }`}
           >
             <div className="text-3xl mb-2">{option.icon}</div>
             <div className="text-lg">{option.label}</div>
@@ -255,8 +253,8 @@ function Step3({
   selected,
   onSelect,
 }: {
-  selected?: string;
-  onSelect: (value: any) => void;
+  selected?: PreferredTone;
+  onSelect: (value: PreferredTone) => void;
 }) {
   const options: Array<{
     value: PreferredTone;
@@ -264,31 +262,31 @@ function Step3({
     icon: string;
     description: string;
   }> = [
-    {
-      value: 'casual',
-      label: 'Santai',
-      icon: '☕',
-      description: 'Obrolan ringan dan menyenangkan',
-    },
-    {
-      value: 'honest',
-      label: 'Jujur',
-      icon: '💬',
-      description: 'Terbuka dan apa adanya',
-    },
-    {
-      value: 'fun',
-      label: 'Seru',
-      icon: '🎉',
-      description: 'Penuh tawa dan energi',
-    },
-    {
-      value: 'serious',
-      label: 'Serius',
-      icon: '🤔',
-      description: 'Mendalam dan bermakna',
-    },
-  ];
+      {
+        value: 'casual',
+        label: 'Santai',
+        icon: '☕',
+        description: 'Obrolan ringan dan menyenangkan',
+      },
+      {
+        value: 'honest',
+        label: 'Jujur',
+        icon: '💬',
+        description: 'Terbuka dan apa adanya',
+      },
+      {
+        value: 'fun',
+        label: 'Seru',
+        icon: '🎉',
+        description: 'Penuh tawa dan energi',
+      },
+      {
+        value: 'serious',
+        label: 'Serius',
+        icon: '🤔',
+        description: 'Mendalam dan bermakna',
+      },
+    ];
 
   return (
     <div>
@@ -306,11 +304,10 @@ function Step3({
           <button
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${
-              selected === option.value
+            className={`p-6 rounded-lg border-2 border-[#1c1b1b] font-['Hanken_Grotesk',sans-serif] font-bold text-left transition-all ${selected === option.value
                 ? 'bg-[#ff7551] text-[#6b1500] shadow-[4px_4px_0px_#1c1b1b]'
                 : 'bg-white text-[#1c1b1b] hover:shadow-[4px_4px_0px_#1c1b1b] hover:translate-y-[-2px]'
-            }`}
+              }`}
           >
             <div className="text-3xl mb-2">{option.icon}</div>
             <div className="text-lg mb-1">{option.label}</div>
