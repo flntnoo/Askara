@@ -154,18 +154,18 @@ function serializeRoom(room: RoomRecord, viewerUserId?: string): MultiplayerRoom
     const card = canonicalCard ?? toConversationCard(state.card);
 
     return {
-    id: state.id,
-    roomId: state.roomId,
-    cardId: state.cardId,
-    position: state.position,
-    isRevealed: state.isRevealed,
-    revealedAt: state.revealedAt?.toISOString(),
-    revealedByPlayerId: state.revealedByPlayerId ?? undefined,
-    revealedByPlayerName: state.revealedByPlayer?.displayName,
-    card: {
+      id: state.id,
+      roomId: state.roomId,
+      cardId: state.cardId,
+      position: state.position,
+      isRevealed: state.isRevealed,
+      revealedAt: state.revealedAt?.toISOString(),
+      revealedByPlayerId: state.revealedByPlayerId ?? undefined,
+      revealedByPlayerName: state.revealedByPlayer?.displayName,
+      card: {
         ...card,
-      cardBackImageSrc: getBoardCardBackImageSrc(room.deckId),
-    },
+        cardBackImageSrc: getBoardCardBackImageSrc(room.deckId),
+      },
     };
   });
 
