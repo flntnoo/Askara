@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { prisma } from '../src/lib/prisma';
 
 const WAITING_ROOM_TTL_MS = 60 * 60 * 1000;

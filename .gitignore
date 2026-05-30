@@ -5,6 +5,7 @@ dist/
 build/
 .next/
 .vite/
+src/generated/prisma/
 .DS_Store 
 *.log
 next-dev.log
