@@ -1,8 +1,24 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/generated/prisma/client';
 import { CARDS } from '../src/data/cards';
 import { DECKS } from '../src/data/decks';
 
-const prisma = new PrismaClient();
+function getDatabaseUrl() {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
+  return databaseUrl;
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({
+    connectionString: getDatabaseUrl(),
+  }),
+});
 
 async function main() {
   if (DECKS.length !== 9) {
